@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#050505">
+<title>999 · UI 点击音效试听</title>
+<meta name="description" content="试听 999 网站 UI 点触音效候选，感受交互反馈的质感。">
+<meta name="keywords" content="999, 音效, UI, 试听">
+<meta name="author" content="999">
+<link rel="canonical" href="https://nine999art.com/sound-preview.html">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+<!-- Open Graph -->
+<meta property="og:site_name" content="999">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nine999art.com/sound-preview.html">
+<meta property="og:title" content="999 · UI 点击音效试听">
+<meta property="og:description" content="试听 999 网站 UI 点触音效候选，感受交互反馈的质感。">
+<meta property="og:image" content="https://af1a7f02cb904d909a3b3c370c67db60.app.codebuddy.work/assets/images/share-cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_CN">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="999 · UI 点击音效试听">
+<meta name="twitter:description" content="试听 999 网站 UI 点触音效候选，感受交互反馈的质感。">
+<meta name="twitter:image" content="https://af1a7f02cb904d909a3b3c370c67db60.app.codebuddy.work/assets/images/share-cover.jpg">
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0a; --fg:#f2f2f2; --fg-dim:#8a8a8a; --border:rgba(255,255,255,.12);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    background:var(--bg); color:var(--fg);
+    font-family:'Noto Serif SC', serif;
+    line-height:1.7; padding:48px 24px 80px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{ max-width:860px; margin:0 auto; }
+  h1{ font-weight:500; font-size:1.9rem; letter-spacing:.04em; margin-bottom:.4rem; }
+  h1 .en{ font-family:'Cormorant Garamond',serif; font-style:italic; color:var(--fg-dim); font-weight:400; }
+  .lede{ color:var(--fg-dim); font-size:.92rem; margin-bottom:8px; }
+  .note{ color:var(--fg-dim); font-size:.8rem; margin-bottom:36px; border-left:2px solid var(--border); padding-left:12px; }
+  .grid{ display:grid; grid-template-columns:1fr; gap:14px; }
+  .card{
+    border:1px solid var(--border); border-radius:14px; padding:20px 22px;
+    display:flex; align-items:flex-start; gap:18px; background:rgba(255,255,255,.015);
+    transition:border-color .3s ease, background .3s ease;
+  }
+  .card:hover{ border-color:rgba(255,255,255,.28); background:rgba(255,255,255,.03); }
+  .idx{
+    font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:500;
+    color:var(--fg-dim); min-width:34px; line-height:1.2;
+  }
+  .body{ flex:1; }
+  .name{ font-size:1.05rem; font-weight:600; letter-spacing:.02em; }
+  .src{ font-size:.74rem; color:var(--fg-dim); margin:.3rem 0 .5rem; letter-spacing:.02em; }
+  .src b{ color:#bcbcbc; font-weight:500; }
+  .desc{ font-size:.86rem; color:#cfcfcf; }
+  .play{
+    flex-shrink:0; align-self:center;
+    font-family:'Cormorant Garamond',serif; font-size:.95rem; letter-spacing:.12em;
+    color:var(--fg); background:transparent; border:1px solid var(--border);
+    border-radius:999px; padding:10px 20px; cursor:pointer;
+    transition:all .25s ease; min-width:78px;
+  }
+  .play:hover{ border-color:#fff; background:rgba(255,255,255,.06); }
+  .play:active{ transform:scale(.96); }
+  .footer{
+    margin-top:40px; padding-top:22px; border-top:1px solid var(--border);
+    color:var(--fg-dim); font-size:.84rem;
+  }
+  .footer b{ color:#cfcfcf; font-weight:500; }
+  @media (max-width:560px){
+    .card{ flex-direction:column; gap:12px; }
+    .play{ align-self:flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>UI 点击音效试听 <span class="en">/ Sound Palette</span></h1>
+  <p class="lede">下面 6 种都来自真实的设计规范与开源库，全部「正式、克制、不浮夸」。</p>
+  <p class="note">点击右侧「试听」键即可听到（建议用电脑外放或耳机）。每种都对应不同的调性，听完后告诉我选哪几个——也可以混搭（例如：普通点击用 A，打开大图用 F）。</p>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="footer">
+    <p><b>怎么选：</b>回复字母即可（如「选 A 和 F」「点击用 B、打开大图用 E」）。</p>
+    <p>选定后我会把对应音效落地到网站——全站点击/按钮都出声，无开关按钮，且图片显示逻辑完全不动。</p>
+  </div>
+</div>
+
+<script>
+/* ---------- Web Audio 合成（无音频文件，纯代码生成） ---------- */
+let ctx;
+function ac(){
+  if(!ctx) ctx = new (window.AudioContext||window.webkitAudioContext)();
+  if(ctx.state==='suspended') ctx.resume();
+  return ctx;
+}
+function tone(opt){
+  const c=ac(), t=c.currentTime;
+  const dur=opt.dur||0.03, peak=opt.peak||0.05, lp=opt.lp||4500, type=opt.type||'sine';
+  function voice(f,g0){
+    const o=c.createOscillator(), g=c.createGain(), f2=c.createBiquadFilter();
+    o.type=type; o.frequency.setValueAtTime(f,t);
+    if(opt.freqEnd) o.frequency.exponentialRampToValueAtTime(opt.freqEnd,t+dur);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(g0,t+0.003);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    f2.type='lowpass'; f2.frequency.value=lp;
+    o.connect(g); g.connect(f2); f2.connect(c.destination);
+    o.start(t); o.stop(t+dur+0.03);
+  }
+  voice(opt.freq, peak);
+  (opt.harmonics||[]).forEach(h=>voice(h.f,h.g));
+}
+function noise(opt){
+  const c=ac(), t=c.currentTime;
+  const dur=opt.dur||0.05, peak=opt.peak||0.04;
+  const len=Math.floor(c.sampleRate*dur);
+  const buf=c.createBuffer(1,len,c.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i]=(Math.random()*2-1);
+  const src=c.createBufferSource(); src.buffer=buf;
+  const f=c.createBiquadFilter(); f.type=opt.filter||'bandpass'; f.frequency.value=opt.freq||1300; f.Q.value=opt.q||1;
+  const g=c.createGain();
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(peak,t+0.005);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  src.connect(f); f.connect(g); g.connect(c.destination);
+  src.start(t); src.stop(t+dur+0.03);
+}
+
+/* ---------- 6 种音效定义 ---------- */
+const SOUNDS = {
+  A: ()=> tone({freq:1180, type:'sine', dur:0.028, peak:0.05, lp:3600, harmonics:[{f:1760,g:0.018}]}),
+  B: ()=> tone({freq:1050, type:'sine', dur:0.03, peak:0.06, lp:5500, freqEnd:980}),
+  C: ()=> tone({freq:700, type:'triangle', dur:0.04, peak:0.045, lp:6500, harmonics:[{f:1750,g:0.02}]}),
+  D: ()=>{ tone({freq:185, type:'sine', dur:0.035, peak:0.07, lp:1100}); noise({freq:240,q:0.7,dur:0.018,peak:0.03,filter:'lowpass'}); },
+  E: ()=> noise({freq:1300, q:0.8, dur:0.05, peak:0.035, filter:'bandpass'}),
+  F: ()=> tone({freq:880, freqEnd:520, type:'triangle', dur:0.06, peak:0.05, lp:4200})
+};
+
+/* ---------- 数据：名称 / 来源 / 描述 ---------- */
+const DATA = [
+  { id:'A', name:'Apple 轻柔咔嗒', src:'参考 <b>Apple WWDC17《设计声音》</b> 主屏按钮反馈 · 开源库 <b>tiks</b> 的 soft 主题（"温暖圆润，有点苹果那股精致劲"）',
+    desc:'双正弦叠加 + 低通磨暖，约 28 毫秒。像手指轻触玻璃——温和、精致、几乎不抢戏。最贴合"正式网站"的安全选择。' },
+  { id:'B', name:'标准 UI Click', src:'参考 <b>offline.observer</b> 的合成 UI Click（C6 1046Hz 正弦，30ms 瞬态）· 心理声学"闭合感"经典参数',
+    desc:'单一正弦 + 极快起音/衰减，带轻微下滑。清脆、精确、是教科书里"click"该有的样子，不甜不噪。' },
+  { id:'C', name:'数码精确感', src:'参考交互音效矩阵中的 <b>"数码感"</b>（高频谐波丰富、合成器质感、高效精确）',
+    desc:'三角波 + 高频谐波，约 40 毫秒。现代、利落，略带电子味但不刺耳。适合偏科技/数字艺术的定位。' },
+  { id:'D', name:'机械实体键', src:'参考交互音效矩阵中的 <b>"机械感"</b>（中低频、明显瞬态打击、物理真实感）',
+    desc:'低频正弦 + 极短噪声瞬态。敦实、稳重，像按下实体开关——适合"确认/开启"这类需要分量的动作。' },
+  { id:'E', name:'有机温和', src:'参考 <b>Pixabay / Freesound</b> 的模拟触碰采样 · 交互音效矩阵中的 <b>"有机感"</b>（白噪声、微量混响、温和舒适）',
+    desc:'带通滤波白噪声一抹而过，约 50 毫秒。柔和、不侵入，像纸面轻擦——极简主义 UI 里"有温度"的那一档。' },
+  { id:'F', name:'Mac 邮件"嗖"', src:'参考 <b>Apple Mac 邮件发送声</b>（轻盈下行 glide，双声道空间感）',
+    desc:'三角波 880→520Hz 下行滑音，约 60 毫秒。优雅、轻盈，最适合"打开大图 / 转场"这类展开动作，比单纯点击更有层次。' }
+];
+
+/* ---------- 渲染 ---------- */
+const grid=document.getElementById('grid');
+DATA.forEach(d=>{
+  const card=document.createElement('div');
+  card.className='card';
+  card.innerHTML =
+    '<div class="idx">'+d.id+'</div>'+
+    '<div class="body">'+
+      '<div class="name">'+d.name+'</div>'+
+      '<div class="src">'+d.src+'</div>'+
+      '<div class="desc">'+d.desc+'</div>'+
+    '</div>'+
+    '<button class="play" data-id="'+d.id+'">试听</button>';
+  grid.appendChild(card);
+});
+grid.addEventListener('click', e=>{
+  const btn=e.target.closest('.play');
+  if(!btn) return;
+  SOUNDS[btn.dataset.id]();
+  btn.textContent='♪';
+  setTimeout(()=>btn.textContent='试听',280);
+});
+</script>
+</body>
+</html>

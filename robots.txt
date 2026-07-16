@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /concept-field.html
+Disallow: /concept-field2.html
+Disallow: /concept-field3.html
+Disallow: /concept-field4.html
+
+Sitemap: https://nine999art.com/sitemap.xml

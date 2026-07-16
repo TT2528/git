@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#050505">
+  <title>THE FIELD · 俯瞰 — 999</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --ink:#050505;
+      --fg:rgba(255,255,255,0.92);
+      --muted:rgba(255,255,255,0.40);
+      --font-display:'Cormorant Garamond','Noto Serif SC',serif;
+      --font-sub:'Noto Serif SC',serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html,body{height:100%;}
+    body{
+      background:var(--ink);
+      color:var(--fg);
+      font-family:var(--font-sub);
+      overflow:hidden;
+      -webkit-font-smoothing:antialiased;
+      cursor:default;
+    }
+
+    /* 流体背景_blob */
+    .blob{
+      position:fixed; border-radius:50%; filter:blur(80px); opacity:.12;
+      pointer-events:none; z-index:0; mix-blend-mode:screen;
+      animation:blobFloat 26s ease-in-out infinite alternate;
+    }
+    .blob--1{width:46vmax;height:46vmax;left:-8vmax;top:-6vmax;
+      background:radial-gradient(circle,#5b1d22,transparent 65%);}
+    .blob--2{width:40vmax;height:40vmax;right:-10vmax;bottom:-8vmax;
+      background:radial-gradient(circle,#1d3a5b,transparent 65%);animation-delay:-12s;}
+    @keyframes blobFloat{
+      0%{transform:translate(0,0) scale(1);}
+      100%{transform:translate(6vmax,4vmax) scale(1.12);}
+    }
+
+    /* 顶栏 */
+    .topbar{
+      position:fixed; top:0; left:0; right:0; z-index:30;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:22px 30px; pointer-events:none;
+    }
+    .topbar__logo{
+      font-family:var(--font-display); font-weight:300;
+      font-size:26px; letter-spacing:.32em; color:var(--fg);
+      text-indent:.16em;
+    }
+    .topbar__title{
+      font-family:var(--font-sub); font-weight:300; font-size:10px;
+      letter-spacing:.42em; color:var(--muted); text-transform:uppercase;
+    }
+
+    /* 场域 */
+    .field{
+      position:absolute; top:-6%; left:-6%; right:-6%; bottom:-6%;
+      z-index:10; will-change:transform;
+      transition:opacity .5s ease, filter .5s ease;
+    }
+    .field.dimmed{ opacity:.28; filter:blur(2px) brightness(.8); }
+
+    .node{
+      position:absolute; transform:translate(-50%,-50%);
+      aspect-ratio:4/5; display:block; padding:0; border:none;
+      background:none; cursor:pointer; border-radius:3px;
+      transition:transform .55s cubic-bezier(.22,1,.36,1), box-shadow .4s ease;
+      outline:none;
+    }
+    .node--heavy{ z-index:14; }
+    .node--normal{ z-index:12; }
+    .node--light{ z-index:11; }
+    .node__inner{
+      position:relative; display:block; width:100%; height:100%;
+      border-radius:3px; overflow:hidden;
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:0 10px 40px rgba(0,0,0,.55);
+      animation:nodeDrift var(--dur,12s) ease-in-out var(--delay,0s) infinite;
+    }
+    .node__inner img{
+      width:100%; height:100%; object-fit:cover; display:block;
+      filter:brightness(.92) contrast(1.04) saturate(.95);
+      animation:imgPulse calc(var(--dur,12s) * 1.6) ease-in-out infinite;
+    }
+    .node__label{
+      position:absolute; left:0; right:0; bottom:0;
+      padding:8px 9px; font-size:9px; letter-spacing:.04em;
+      color:rgba(255,255,255,.92); text-align:left; line-height:1.4;
+      background:linear-gradient(0deg,rgba(0,0,0,.78),transparent);
+      opacity:0; transform:translateY(6px);
+      transition:opacity .35s ease, transform .35s ease;
+      font-family:var(--font-sub); font-weight:400;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .node:hover, .node:focus-visible{ transform:translate(-50%,-50%) scale(1.10); z-index:20; }
+    .node:hover .node__inner, .node:focus-visible .node__inner{ border-color:rgba(255,255,255,.5); box-shadow:0 14px 60px rgba(0,0,0,.7); }
+    .node:hover .node__label, .node:focus-visible .node__label{ opacity:1; transform:translateY(0); }
+    .node.focused{ transform:translate(-50%,-50%) scale(1.18); z-index:25; }
+    .node.focused .node__inner{
+      border-color:rgba(255,255,255,.85);
+      box-shadow:0 0 0 1px rgba(255,255,255,.5),0 18px 70px rgba(0,0,0,.75);
+    }
+    .node.focused .node__label{ opacity:1; transform:translateY(0); }
+
+    @keyframes nodeDrift{
+      0%,100%{ transform:translate(0,0) rotate(0deg); }
+      50%{ transform:translate(var(--dx,8px),var(--dy,8px)) rotate(var(--rot,0deg)); }
+    }
+    @keyframes imgPulse{
+      0%,100%{ transform:scale(1); }
+      50%{ transform:scale(1.07); }
+    }
+
+    /* 详情抽屉 */
+    .detail{
+      position:fixed; top:0; right:0; height:100%; z-index:40;
+      width:clamp(320px,38vw,540px);
+      background:rgba(8,8,9,.86); backdrop-filter:blur(14px);
+      border-left:1px solid rgba(255,255,255,.10);
+      transform:translateX(100%); transition:transform .55s cubic-bezier(.22,1,.36,1);
+      display:flex; flex-direction:column; padding:64px 34px 34px;
+      overflow-y:auto;
+    }
+    .detail.open{ transform:translateX(0); }
+    .detail__close{
+      position:absolute; top:20px; right:22px; width:34px; height:34px;
+      border:1px solid rgba(255,255,255,.18); background:none; color:var(--fg);
+      border-radius:50%; cursor:pointer; font-size:16px; line-height:1;
+      transition:border-color .3s ease, transform .3s ease;
+    }
+    .detail__close:hover{ border-color:rgba(255,255,255,.6); transform:rotate(90deg); }
+    .detail__media{
+      width:100%; aspect-ratio:4/5; border-radius:3px; overflow:hidden;
+      border:1px solid rgba(255,255,255,.10); margin-bottom:22px; flex-shrink:0;
+    }
+    .detail__media img{
+      width:100%; height:100%; object-fit:cover; display:block;
+      animation:imgPulse 22s ease-in-out infinite;
+      filter:brightness(.95) contrast(1.05);
+    }
+    .detail__series{
+      font-family:var(--font-sub); font-weight:300; font-size:10px;
+      letter-spacing:.34em; color:var(--muted); text-transform:uppercase;
+      margin-bottom:10px;
+    }
+    .detail__title{
+      font-family:var(--font-display); font-weight:300; font-size:clamp(1.4rem,2.4vw,2rem);
+      letter-spacing:.06em; color:var(--fg); line-height:1.2; margin-bottom:14px;
+    }
+    .detail__tag{
+      display:inline-block; font-family:var(--font-sub); font-weight:400;
+      font-size:10px; letter-spacing:.1em; color:rgba(255,255,255,.7);
+      border:1px solid rgba(255,255,255,.18); border-radius:2px;
+      padding:5px 10px; margin-bottom:18px;
+    }
+    .detail__desc{
+      font-family:var(--font-sub); font-weight:300; font-size:.86rem;
+      line-height:2; color:rgba(255,255,255,.72);
+    }
+
+    /* 底部提示 */
+    .hint{
+      position:fixed; bottom:22px; left:0; right:0; z-index:30;
+      text-align:center; pointer-events:none;
+      font-family:var(--font-sub); font-weight:300; font-size:10px;
+      letter-spacing:.28em; color:var(--muted); text-transform:uppercase;
+    }
+
+    @media (max-width:768px){
+      .detail{ width:100%; padding-top:58px; }
+      .topbar__title{ display:none; }
+      .hint{ font-size:9px; letter-spacing:.18em; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="blob blob--1"></div>
+  <div class="blob blob--2"></div>
+
+  <header class="topbar">
+    <div class="topbar__logo">999</div>
+    <div class="topbar__title">The Field · 俯瞰</div>
+  </header>
+
+  <main class="field" id="field"></main>
+
+  <aside class="detail" id="detail" aria-hidden="true">
+    <button class="detail__close" id="detailClose" aria-label="关闭">✕</button>
+    <div class="detail__media"><img id="detailImg" src="" alt=""></div>
+    <div class="detail__series" id="detailSeries"></div>
+    <h2 class="detail__title" id="detailTitle"></h2>
+    <span class="detail__tag" id="detailTag"></span>
+    <p class="detail__desc" id="detailDesc"></p>
+  </aside>
+
+  <div class="hint">移动光标微移视角 · 点击作品就地展开 · 点空白收起</div>
+
+  <script>
+    const WORKS = [
+      { id:1,  ser:0, t:"百合花白马 · 亮面丝绸（主版）", s:"01 · 百合花白马", w:"heavy",
+        img:"assets/images/百合花白马最新800MM焦距png亮面丝绸(1).png", tag:"3D渲染 · 主版",
+        d:"银白马身覆鎏金百合与克林姆特纹样，红蓝网格地面托起悬浮正红球。" },
+      { id:2,  ser:0, t:"百合花白马 · 反转色变体", s:"01 · 百合花白马", w:"light",
+        img:"assets/images/百合花白马最新800MM焦距png反转色.png", tag:"3D渲染 · 变体",
+        d:"主版构图的负片版本，冷调青铜质感，移除红球的另一种存在。" },
+      { id:3,  ser:0, t:"百合花白马 · 唱片封套", s:"01 · 百合花白马", w:"light",
+        img:"assets/images/IMG_20260405_190808.jpg", tag:"平面排版 · 概念",
+        d:"主版重编为黑胶封套语言，圆形裁切加模拟播放器控件。" },
+      { id:4,  ser:0, t:"百合花白马 · 六格变体矩阵", s:"01 · 百合花白马", w:"light",
+        img:"assets/images/retouch_2025110112445302.jpg", tag:"变体研究 · 矩阵",
+        d:"同一白马构图的六种后期分身，排列成 2×3 矩阵。" },
+      { id:5,  ser:1, t:"Bàn tay · Chín cách nhìn", s:"02 · 身体研究与手的变体", w:"normal",
+        img:"assets/images/MEITU_20251231_172505115.jpg", tag:"身体研究 · 光谱变体",
+        d:"同一只手，九种视觉语法：红宝石、红外、X光、热成像、水雾、点阵……" },
+      { id:6,  ser:1, t:"手 · 3D材质雕刻", s:"02 · 身体研究与手的变体", w:"light",
+        img:"assets/images/retouch_2025110112454483.jpg", tag:"3D雕刻 · 材质研究",
+        d:"手经 3D 雕刻赋予风化石、玻璃、文字点阵、故障态等异质材料。" },
+      { id:7,  ser:1, t:"Manus Multiplex", s:"02 · 身体研究与手的变体", w:"heavy",
+        img:"assets/images/MEITU_20251231_192537304.jpg", tag:"身体研究 · 多材质",
+        d:"雾中红丝绒宝石掌，多格拆解肉身、体温与数字分身的共生。" },
+      { id:8,  ser:1, t:"指纹里流淌的二进制河", s:"02 · 身体研究与手的变体", w:"normal",
+        img:"assets/images/IMG_1861.jpg", tag:"C4D · 动态设计 · 参数化",
+        d:"指纹纹路中流淌字符河流，C4D 参数化驱动的代码母体。" },
+      { id:9,  ser:2, t:"菩萨 · 流体解构", s:"03 · 流体肖像与解构人像", w:"heavy",
+        img:"assets/images/菩萨.png", tag:"流体绘画",
+        d:"黑色剪影人像覆红蓝流体泼溅，借神圣意象反衬肖像的破碎。" },
+      { id:10, ser:2, t:"无题 · 头巾波纹", s:"03 · 流体肖像与解构人像", w:"normal",
+        img:"assets/images/Screenshot_2025-10-18-20-24-08-95_99c04817c0de5652397fc8b56c3b3817.jpg", tag:"数字混合媒介",
+        d:"红色光环笼罩头部，蓝袍水波扭曲，边缘数字故障的疏离信号。" },
+      { id:11, ser:2, t:"无题 · 蓝发晶体", s:"03 · 流体肖像与解构人像", w:"normal",
+        img:"assets/images/retouch_2025081414350095.jpg", tag:"3D渲染 / 数字肖像",
+        d:"瓷质侧影长发如蓝水流泻，颈侧生长红色晶体与冰晶碎块。" },
+      { id:12, ser:2, t:"无题 · 红色熔炉", s:"03 · 流体肖像与解构人像", w:"normal",
+        img:"assets/images/新.jpg", tag:"数字解构 · 单色",
+        d:"单色熔岩红中多张面孔浮现又淹没，龟裂如干涸河床。" },
+      { id:13, ser:3, t:"无题 · 蓝色植物", s:"04 · 抽象流体绘画", w:"light",
+        img:"assets/images/蓝色流体植物.png", tag:"流体绘画 · 抽象",
+        d:"群青深处白色植物自流体中升起，接近丙烯倾倒的沉浸之作。" },
+      { id:14, ser:3, t:"无题 · 流体飞鸟", s:"04 · 抽象流体绘画", w:"normal",
+        img:"assets/images/retouch_2024032121030193.jpg", tag:"流体绘画 · 具象-抽象交界",
+        d:"青蓝液态金属蜂鸟悬停于粉橙流体漩涡，图底共享同一存在。" },
+      { id:15, ser:4, t:"五联 · 抽象流体雕塑", s:"05 · 抽象3D与建筑空间", w:"light",
+        img:"assets/images/IMG_20260405_190358.png", tag:"3D渲染 · 五联",
+        d:"五幅 3D 抽象流体形态，红线如伤口切开所有造物。" },
+      { id:16, ser:4, t:"无题 · 哥特的余烬", s:"05 · 抽象3D与建筑空间", w:"heavy",
+        img:"assets/images/IMG_20260210_090302.jpg", tag:"场景渲染 · 建筑",
+        d:"哥特教堂内天使举火炬，红色光晕如永不熄灭的火灾。" },
+      { id:17, ser:5, t:"KINO · 冬之枯木与白发", s:"06 · 电影感与长卷肖像", w:"normal",
+        img:"assets/images/MEITU_20260307_192450919.jpg", tag:"电影感 / 氛围肖像",
+        d:"黑肤白发女性侧影，枯枝自体内穿透，电影海报式寒冷忍耐。" },
+      { id:18, ser:5, t:"L'Arborescence sous la Neige", s:"06 · 电影感与长卷肖像", w:"light",
+        img:"assets/images/MEITU_20260307_191145286.jpg", tag:"长卷 / 多重曝光",
+        d:"覆雪枯木长卷中枝影化人形，黑白银白构筑寒冬里的自愈。" },
+      { id:19, ser:6, t:"羊羊眼 · 彩色线条凝视", s:"07 · 感知边界实验", w:"normal",
+        img:"assets/images/羊羊眼www.png", tag:"线描 / 感知实验",
+        d:"眼球被数千条彩色线条重构，观看对象反过来凝视观看者。" },
+      { id:20, ser:6, t:"无题 · 红框解构", s:"07 · 感知边界实验", w:"heavy",
+        img:"assets/images/重修8.png", tag:"线描 / 框架实验",
+        d:"青蓝线描眼球嵌套层叠小眼，红框与字句构成精神困境闭环。" }
+    ];
+
+    const REGIONS = [
+      { x:28, y:26 }, { x:74, y:22 }, { x:16, y:54 }, { x:44, y:48 },
+      { x:80, y:54 }, { x:24, y:80 }, { x:76, y:80 }
+    ];
+    const sizeOf = w => w === "heavy" ? 15 : w === "light" ? 7 : 10;
+
+    // 确定性随机，保证布局稳定
+    function mulberry32(a){
+      return function(){
+        a |= 0; a = a + 0x6D2B79F5 | 0;
+        let t = Math.imul(a ^ a >>> 15, 1 | a);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+    }
+    const rand = mulberry32(999);
+
+    const placed = [];
+    WORKS.forEach(wk => {
+      const reg = REGIONS[wk.ser];
+      const sz = sizeOf(wk.w);
+      let chosen = null;
+      for (let i = 0; i < 260; i++){
+        const ang = rand() * Math.PI * 2;
+        const rad = 6 + rand() * 22;
+        let x = reg.x + Math.cos(ang) * rad;
+        let y = reg.y + Math.sin(ang) * rad * 0.82;
+        x = Math.max(sz/2 + 3, Math.min(97 - sz/2 - 3, x));
+        y = Math.max(sz/2 + 6, Math.min(94 - sz/2 - 6, y));
+        let ok = true;
+        for (const p of placed){
+          const minD = (sz + p.sz) / 2 * 0.66 + 4;
+          if (Math.hypot(x - p.x, y - p.y) < minD){ ok = false; break; }
+        }
+        if (ok){ chosen = { x, y }; break; }
+        if (!chosen) chosen = { x, y };
+      }
+      wk.x = chosen.x; wk.y = chosen.y; wk.sz = sz;
+      placed.push({ x: chosen.x, y: chosen.y, sz });
+    });
+
+    const field = document.getElementById("field");
+    WORKS.forEach(wk => {
+      const node = document.createElement("button");
+      node.className = "node node--" + wk.w;
+      node.style.left = wk.x + "%";
+      node.style.top = wk.y + "%";
+      node.style.width = wk.sz + "%";
+      node.style.setProperty("--dx", (4 + rand() * 14).toFixed(1) + "px");
+      node.style.setProperty("--dy", (4 + rand() * 14).toFixed(1) + "px");
+      node.style.setProperty("--rot", ((rand() * 2 - 1) * 2).toFixed(2) + "deg");
+      node.style.setProperty("--dur", (9 + rand() * 8).toFixed(1) + "s");
+      node.style.setProperty("--delay", (-rand() * 10).toFixed(1) + "s");
+      node.innerHTML =
+        '<span class="node__inner"><img src="' + wk.img + '" alt="' + wk.t + '">' +
+        '<span class="node__label">' + wk.t + '</span></span>';
+      node.addEventListener("click", e => { e.stopPropagation(); openDetail(wk, node); });
+      field.appendChild(node);
+    });
+
+    const detail = document.getElementById("detail");
+    function openDetail(wk, node){
+      document.querySelectorAll(".node.focused").forEach(n => n.classList.remove("focused"));
+      node.classList.add("focused");
+      field.classList.add("dimmed");
+      document.getElementById("detailImg").src = wk.img;
+      document.getElementById("detailSeries").textContent = wk.s;
+      document.getElementById("detailTitle").textContent = wk.t;
+      document.getElementById("detailTag").textContent = wk.tag;
+      document.getElementById("detailDesc").textContent = wk.d;
+      detail.classList.add("open");
+      detail.setAttribute("aria-hidden", "false");
+    }
+    function closeDetail(){
+      detail.classList.remove("open");
+      detail.setAttribute("aria-hidden", "true");
+      field.classList.remove("dimmed");
+      document.querySelectorAll(".node.focused").forEach(n => n.classList.remove("focused"));
+    }
+    document.getElementById("detailClose").addEventListener("click", closeDetail);
+    field.addEventListener("click", e => { if (e.target === field) closeDetail(); });
+    window.addEventListener("keydown", e => { if (e.key === "Escape") closeDetail(); });
+
+    // 整片场域视差
+    let tx = 0, ty = 0, cx = 0, cy = 0;
+    window.addEventListener("mousemove", e => {
+      tx = e.clientX / window.innerWidth - 0.5;
+      ty = e.clientY / window.innerHeight - 0.5;
+    });
+    (function raf(){
+      cx += (tx - cx) * 0.06;
+      cy += (ty - cy) * 0.06;
+      field.style.transform = "translate(" + (cx * -18) + "px," + (cy * -18) + "px)";
+      requestAnimationFrame(raf);
+    })();
+  </script>
+</body>
+</html>

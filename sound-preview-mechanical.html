@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#050505">
+<title>999 · 机械实体键音效家族试听</title>
+<meta name="description" content="试听 999 网站机械实体键音效家族，为点击赋予实体触感。">
+<meta name="keywords" content="999, 音效, 机械, 试听">
+<meta name="author" content="999">
+<link rel="canonical" href="https://nine999art.com/sound-preview-mechanical.html">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+<!-- Open Graph -->
+<meta property="og:site_name" content="999">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nine999art.com/sound-preview-mechanical.html">
+<meta property="og:title" content="999 · 机械实体键音效家族试听">
+<meta property="og:description" content="试听 999 网站机械实体键音效家族，为点击赋予实体触感。">
+<meta property="og:image" content="https://af1a7f02cb904d909a3b3c370c67db60.app.codebuddy.work/assets/images/share-cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_CN">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="999 · 机械实体键音效家族试听">
+<meta name="twitter:description" content="试听 999 网站机械实体键音效家族，为点击赋予实体触感。">
+<meta name="twitter:image" content="https://af1a7f02cb904d909a3b3c370c67db60.app.codebuddy.work/assets/images/share-cover.jpg">
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#0a0a0a; --fg:#f2f2f2; --fg-dim:#8a8a8a; --border:rgba(255,255,255,.12); }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ background:var(--bg); color:var(--fg); font-family:'Noto Serif SC', serif; line-height:1.7; padding:48px 24px 80px; -webkit-font-smoothing:antialiased; }
+  .wrap{ max-width:860px; margin:0 auto; }
+  h1{ font-weight:500; font-size:1.9rem; letter-spacing:.04em; margin-bottom:.4rem; }
+  h1 .en{ font-family:'Cormorant Garamond',serif; font-style:italic; color:var(--fg-dim); font-weight:400; }
+  .lede{ color:var(--fg-dim); font-size:.92rem; margin-bottom:8px; }
+  .note{ color:var(--fg-dim); font-size:.8rem; margin-bottom:36px; border-left:2px solid var(--border); padding-left:12px; }
+  .grid{ display:grid; grid-template-columns:1fr; gap:14px; }
+  .card{ border:1px solid var(--border); border-radius:14px; padding:20px 22px; display:flex; align-items:flex-start; gap:18px; background:rgba(255,255,255,.015); transition:border-color .3s ease, background .3s ease; }
+  .card:hover{ border-color:rgba(255,255,255,.28); background:rgba(255,255,255,.03); }
+  .idx{ font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:500; color:var(--fg-dim); min-width:34px; line-height:1.2; }
+  .body{ flex:1; }
+  .name{ font-size:1.05rem; font-weight:600; letter-spacing:.02em; }
+  .src{ font-size:.74rem; color:var(--fg-dim); margin:.3rem 0 .5rem; letter-spacing:.02em; }
+  .src b{ color:#bcbcbc; font-weight:500; }
+  .desc{ font-size:.86rem; color:#cfcfcf; }
+  .play{ flex-shrink:0; align-self:center; font-family:'Cormorant Garamond',serif; font-size:.95rem; letter-spacing:.12em; color:var(--fg); background:transparent; border:1px solid var(--border); border-radius:999px; padding:10px 20px; cursor:pointer; transition:all .25s ease; min-width:78px; }
+  .play:hover{ border-color:#fff; background:rgba(255,255,255,.06); }
+  .play:active{ transform:scale(.96); }
+  .footer{ margin-top:40px; padding-top:22px; border-top:1px solid var(--border); color:var(--fg-dim); font-size:.84rem; }
+  .footer b{ color:#cfcfcf; font-weight:500; }
+  @media (max-width:560px){ .card{ flex-direction:column; gap:12px; } .play{ align-self:flex-start; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>机械实体键 · 音效家族 <span class="en">/ Mechanical Family</span></h1>
+  <p class="lede">以原 D「机械实体键」为基调，衍生出 6 种不同材质感的变体。全部低频 + 瞬态噪声，正式不浮夸。</p>
+  <p class="note">点击「试听」键即可听到（建议电脑外放/耳机）。选好告诉我字母——可单独用某一种，也可混搭（如普通点击用 D4、确认/开启用 D3）。</p>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="footer">
+    <p><b>怎么选：</b>回复字母即可（如「选 D3」「点击用 D4、打开大图用 D1」）。</p>
+    <p>选定后落地到网站：全站点击/按钮出声，无开关按钮，图片显示逻辑不动。</p>
+  </div>
+</div>
+
+<script>
+let ctx;
+function ac(){ if(!ctx) ctx=new (window.AudioContext||window.webkitAudioContext)(); if(ctx.state==='suspended') ctx.resume(); return ctx; }
+function tone(opt){
+  const c=ac(), t=c.currentTime, dur=opt.dur||0.03, peak=opt.peak||0.05, lp=opt.lp||4500, type=opt.type||'sine';
+  function voice(f,g0){
+    const o=c.createOscillator(), g=c.createGain(), f2=c.createBiquadFilter();
+    o.type=type; o.frequency.setValueAtTime(f,t);
+    if(opt.freqEnd) o.frequency.exponentialRampToValueAtTime(opt.freqEnd,t+dur);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(g0,t+0.003);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    f2.type='lowpass'; f2.frequency.value=lp;
+    o.connect(g); g.connect(f2); f2.connect(c.destination);
+    o.start(t); o.stop(t+dur+0.03);
+  }
+  voice(opt.freq,peak);
+  (opt.harmonics||[]).forEach(h=>voice(h.f,h.g));
+}
+function noise(opt){
+  const c=ac(), t=c.currentTime, dur=opt.dur||0.05, peak=opt.peak||0.04;
+  const len=Math.floor(c.sampleRate*dur), buf=c.createBuffer(1,len,c.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i]=(Math.random()*2-1);
+  const src=c.createBufferSource(); src.buffer=buf;
+  const f=c.createBiquadFilter(); f.type=opt.filter||'bandpass'; f.frequency.value=opt.freq||1300; f.Q.value=opt.q||1;
+  const g=c.createGain();
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(peak,t+0.004);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  src.connect(f); f.connect(g); g.connect(c.destination);
+  src.start(t); src.stop(t+dur+0.03);
+}
+
+/* 机械实体家族：低频正弦 + 瞬态噪声，不同材质 = 不同频率/滤波/时长 */
+const SOUNDS = {
+  D1: ()=>{ tone({freq:150, type:'sine', dur:0.045, peak:0.075, lp:750}); noise({freq:300,q:0.6,dur:0.02,peak:0.03,filter:'lowpass'}); }, // 沉木
+  D2: ()=>{ tone({freq:430, type:'triangle', dur:0.022, peak:0.05, lp:5000}); noise({freq:2600,q:1.4,dur:0.012,peak:0.035,filter:'bandpass'}); }, // 金属电容
+  D3: ()=>{ tone({freq:120, type:'sine', dur:0.05, peak:0.085, lp:560}); noise({freq:220,q:0.5,dur:0.022,peak:0.035,filter:'lowpass'}); }, // 重实体
+  D4: ()=>{ tone({freq:260, type:'sine', dur:0.02, peak:0.06, lp:1600}); noise({freq:1500,q:1,dur:0.012,peak:0.025,filter:'bandpass'}); }, // 轻机械键盘
+  D5: ()=>{ tone({freq:200, type:'sine', dur:0.035, peak:0.06, lp:1200}); noise({freq:900,q:0.8,dur:0.016,peak:0.018,filter:'bandpass'}); }, // 薄膜开关
+  D6: ()=>{ tone({freq:180, type:'sine', dur:0.028, peak:0.07, lp:900}); noise({freq:280,q:0.7,dur:0.014,peak:0.03,filter:'lowpass'}); setTimeout(()=>{ tone({freq:150,type:'sine',dur:0.025,peak:0.05,lp:800}); noise({freq:240,q:0.6,dur:0.012,peak:0.02,filter:'lowpass'}); },55); } // 双段机械
+};
+
+const DATA = [
+  { id:'D1', name:'沉木', src:'低频 150Hz + 木质噪声瞬态 · 低通 750Hz',
+    desc:'像用指节轻敲实木桌面，温润、略闷，最不刺耳的一档。' },
+  { id:'D2', name:'金属电容', src:'三角波 430Hz + 高频带通噪声 · 低通 5kHz',
+    desc:'清脆带金属光泽，像高档电容开关或金属拨片，精确感强。' },
+  { id:'D3', name:'重实体', src:'低频 120Hz + 厚噪声瞬态 · 低通 560Hz',
+    desc:'最敦实、最有分量，像按下实体确认键——适合"开启/确认"类动作。' },
+  { id:'D4', name:'轻机械键盘', src:'260Hz + 短带通噪声 · 低通 1.6kHz',
+    desc:'干净利落的机械键盘感，比原 D 更轻快，适合高频点击不疲劳。' },
+  { id:'D5', name:'薄膜开关', src:'200Hz 正弦 + 轻带通噪声 · 低通 1.2kHz',
+    desc:'柔和、似按薄膜按键，介于机械与无形之间，低调不抢戏。' },
+  { id:'D6', name:'双段机械', src:'两段瞬态（180Hz→150Hz）· 间隔 55ms',
+    desc:'"嗒—咔"两段式，最有物理仪式感，适合重要操作（如提交表单）。' }
+];
+
+const grid=document.getElementById('grid');
+DATA.forEach(d=>{
+  const card=document.createElement('div'); card.className='card';
+  card.innerHTML='<div class="idx">'+d.id+'</div><div class="body"><div class="name">'+d.name+'</div><div class="src">'+d.src+'</div><div class="desc">'+d.desc+'</div></div><button class="play" data-id="'+d.id+'">试听</button>';
+  grid.appendChild(card);
+});
+grid.addEventListener('click', e=>{
+  const btn=e.target.closest('.play'); if(!btn) return;
+  SOUNDS[btn.dataset.id](); btn.textContent='♪'; setTimeout(()=>btn.textContent='试听',300);
+});
+</script>
+</body>
+</html>

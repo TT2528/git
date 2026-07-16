@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#050505">
+  <title>联系 — 999</title>
+  <meta name="description" content="联系999进行合作、展览邀约或创作对话。微信 nine999art，邮箱 eshsb666@qq.com。">
+  <meta name="keywords" content="999, 联系, 微信, 邮箱, 合作, 展览">
+  <meta name="author" content="999">
+  <link rel="canonical" href="https://nine999art.com/contact.html">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+  <meta property="og:site_name" content="999">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://nine999art.com/contact.html">
+  <meta property="og:title" content="联系 — 999">
+  <meta property="og:description" content="联系999进行合作、展览邀约或创作对话。微信 nine999art，邮箱 eshsb666@qq.com。">
+  <meta property="og:image" content="https://af1a7f02cb904d909a3b3c370c67db60.app.codebuddy.work/assets/images/share-cover.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="zh_CN">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="联系 — 999">
+  <meta name="twitter:description" content="联系999进行合作、展览邀约或创作对话。">
+  <meta name="twitter:image" content="https://af1a7f02cb904d909a3b3c370c67db60.app.codebuddy.work/assets/images/share-cover.jpg">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- 导航 -->
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">999</a>
+    <ul class="nav-links">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="portfolio.html">作品集</a></li>
+      <li><a href="models.html">模型展厅</a></li>
+      <li><a href="workflow.html">工作流</a></li>
+      <li><a href="about.html">关于</a></li>
+      <li><a href="contact.html" class="active">联系</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="菜单">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- 联系页面 -->
+  <section class="contact">
+    <div class="contact__layout">
+
+      <!-- 左侧：联系信息 + 社交链接 -->
+      <div class="contact__info reveal-section">
+        <h1>联系</h1>
+        <p>
+          如你对作品合作、展览邀约或创作对话感兴趣，
+          请通过下方表单留言，或经由社交平台与我取得联系。
+          我通常在一周内回复。
+        </p>
+
+        <div class="contact__social">
+          <a href="#" class="contact__social-link" aria-label="微信">
+            <span class="contact__social-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="3"/>
+                <circle cx="12" cy="12" r="3"/>
+                <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/>
+              </svg>
+            </span>
+            WeChat · nine999art
+          </a>
+
+          <a href="mailto:eshsb666@qq.com" class="contact__social-link" aria-label="QQ邮箱">
+            <span class="contact__social-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="2" y="4" width="20" height="16" rx="2"/>
+                <path d="M22 4L12 13 2 4"/>
+              </svg>
+            </span>
+            QQ Email · eshsb666@qq.com
+          </a>
+        </div>
+      </div>
+
+      <!-- 右侧：联系表单 -->
+      <form class="contact__form reveal-text" action="https://formsubmit.co/eshsb666@qq.com" method="POST">
+        <input type="hidden" name="_next" value="https://nine999art.com/thank-you.html">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="table">
+        <input type="text" name="_honey" style="display:none">
+
+        <div class="form-group">
+          <label class="form-label" for="name">姓名</label>
+          <input class="form-input" type="text" id="name" name="name" placeholder="你的名字" autocomplete="name" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">邮箱</label>
+          <input class="form-input" type="email" id="email" name="email" placeholder="your@email.com" autocomplete="email" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="message">留言</label>
+          <textarea class="form-input" id="message" name="message" placeholder="写下你想说的……" required></textarea>
+        </div>
+
+        <button type="submit" class="form-submit">发送留言</button>
+      </form>
+
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <p>&copy; 999 &mdash; 保留所有权利</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

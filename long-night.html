@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>九点九九号宅 · 长夜</title>
+<style>
+  :root{
+    --ink:#0B0D12;
+    --ink-2:#0e1119;
+    --paper:#e7e3da;
+    --paper-dim:#9a968d;
+    --paper-faint:#5c5a54;
+    --hair:rgba(231,227,218,.14);
+    --ember:#c05a3c;
+    --cold:#5b7fb0;
+    --gold:#c9a25b;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:"Songti SC","Noto Serif SC",STSong,"SimSun",Georgia,serif;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.9;
+  }
+  #fluid{position:fixed;inset:0;z-index:0;display:block}
+  #vignette{position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(120% 90% at 50% 40%,transparent 40%,rgba(4,5,8,.7) 100%)}
+
+  .wrap{position:relative;z-index:2;min-height:100%;
+    display:flex;align-items:center;justify-content:center;
+    padding:8vh 6vw}
+  .stage{width:min(680px,100%)}
+
+  /* --- 场景文本 --- */
+  .scene{opacity:0;transform:translateY(14px);
+    transition:opacity 1.2s ease,transform 1.2s ease}
+  .scene.in{opacity:1;transform:none}
+
+  .eyebrow{font-family:"Courier New",ui-monospace,monospace;
+    font-size:11px;letter-spacing:.05em;color:var(--paper-faint);
+    margin-bottom:26px;display:flex;gap:14px;align-items:center}
+  .eyebrow .dot{width:5px;height:5px;border-radius:50%;
+    background:var(--paper-faint);flex:none}
+
+  .speaker{font-family:"Courier New",monospace;font-size:12px;
+    letter-spacing:.04em;color:var(--paper-dim);margin-bottom:14px}
+  .speaker b{color:var(--paper);font-weight:400}
+
+  p.line{font-size:clamp(17px,2.1vw,20px);color:var(--paper);
+    margin:0 0 1.15em;text-wrap:pretty}
+  p.line.q{color:#f0ece2;padding-left:20px;position:relative}
+  p.line.q::before{content:"";position:absolute;left:0;top:.35em;bottom:.35em;
+    width:2px;background:var(--hair)}
+  p.line.faint{color:var(--paper-dim)}
+
+  /* --- 选项 --- */
+  .choices{margin-top:44px;display:flex;flex-direction:column;gap:2px}
+  .choice{
+    appearance:none;background:transparent;border:none;
+    color:var(--paper-dim);text-align:left;cursor:pointer;
+    font-family:inherit;font-size:clamp(15px,1.9vw,17px);line-height:1.7;
+    padding:16px 18px 16px 34px;position:relative;
+    border-top:1px solid var(--hair);
+    transition:color .5s ease,background .5s ease,padding .45s cubic-bezier(.2,.8,.2,1);
+  }
+  .choices .choice:last-child{border-bottom:1px solid var(--hair)}
+  .choice::before{content:"";position:absolute;left:18px;top:50%;
+    width:6px;height:6px;border-radius:50%;
+    background:var(--paper-faint);transform:translateY(-50%) scale(.7);
+    transition:background .5s,transform .5s,box-shadow .5s}
+  .choice:hover{color:var(--paper);background:rgba(231,227,218,.03);padding-left:40px}
+  .choice:hover::before{background:var(--paper);transform:translateY(-50%) scale(1);
+    box-shadow:0 0 14px rgba(231,227,218,.4)}
+  .choice:active{transform:scale(.992)}
+  .choice:focus-visible{outline:none;color:#fff}
+  .choice:focus-visible::before{background:#fff;box-shadow:0 0 14px #fff}
+
+  /* --- 结局 --- */
+  .ending .title{font-size:clamp(24px,4vw,34px);letter-spacing:.02em;
+    margin:8px 0 30px;color:#f2eee4;line-height:1.35}
+  .restart{margin-top:52px;display:inline-flex;align-items:center;gap:10px;
+    background:transparent;border:1px solid var(--hair);color:var(--paper-dim);
+    font-family:"Courier New",monospace;font-size:12px;letter-spacing:.08em;
+    padding:12px 22px;cursor:pointer;border-radius:1px;
+    transition:color .4s,border-color .4s,letter-spacing .4s}
+  .restart:hover{color:var(--paper);border-color:var(--paper-dim);letter-spacing:.14em}
+  .restart:active{transform:scale(.98)}
+
+  .footnote{margin-top:34px;font-family:"Courier New",monospace;
+    font-size:11px;color:var(--paper-faint);letter-spacing:.03em;line-height:1.8}
+
+  /* 进度：夜色刻度 */
+  #nightbar{position:fixed;left:0;top:0;height:2px;width:0%;z-index:5;
+    background:linear-gradient(90deg,var(--cold),var(--paper-dim));
+    opacity:.5;transition:width 1.4s ease,background 1.4s ease}
+
+  .hint{position:fixed;bottom:16px;left:0;right:0;text-align:center;z-index:5;
+    font-family:"Courier New",monospace;font-size:10.5px;letter-spacing:.08em;
+    color:var(--paper-faint);opacity:.6;pointer-events:none}
+
+  @media (prefers-reduced-motion:reduce){
+    .scene{transition:opacity .25s ease}
+    .scene{transform:none}
+  }
+</style>
+</head>
+<body>
+<canvas id="fluid"></canvas>
+<div id="vignette"></div>
+<div id="nightbar"></div>
+
+<div class="wrap">
+  <div class="stage" id="stage"></div>
+</div>
+<div class="hint">用键盘 ↑ ↓ 与 Enter 也可选择</div>
+
+<script>
+/* ============================================================
+   九点九九号宅 · 长夜  —— 交互叙事（更黑·更狠·更深版）
+   隐藏主线：房子=创作者本人，七个系列是它不敢独自面对、因而锁起来的部分。
+   红框解构对失控，是控制狂对"最舍不得放之物"的病态占有。
+   由玩家选择在「序(锁/控制)」与「溶(放/失控)」之间累积，决定房子体温与结局。
+   ============================================================ */
+
+const STORY = {
+  start:{
+    eyebrow:["长夜 · 序","九点九九号宅"],
+    lines:[
+      {t:"灯，是自己灭的。不是谁按了开关——是这栋房子决定今晚不再被看见。"},
+      {t:"你是这栋房子。你叫九点九九，别人省事，喊你 999。你不是盖出来的。你把自己一点一点拆开，塞进七个房间，才成了「一栋房子」。那七个，是你不敢独自面对的七种东西。"},
+      {t:"它们成了精，住在你身体里。你能同时感到：客厅那个把一切摆成直角的（它最怕你空下来），最深处那个不肯坐下的（它最想让你也站不起来），正中央那双一直睁着的眼（它什么都知道，包括你为什么不敢开门）。"},
+      {t:"今夜你要决定一件事——你早该决定了。门，是锁着的。钥匙在你手里，你只是不肯用。"},
+      {t:"你先去哪个房间？",cls:"faint"}
+    ],
+    choices:[
+      {label:"去客厅，看红框解构在忙什么", to:"a1", seq:1},
+      {label:"最深的房间有动静——跟着「失控」走过去", to:"b1", dis:1},
+      {label:"哪也不去。坐到「凝视」身边，和它一起不动", to:"c1"}
+    ]
+  },
+
+  /* ---------- 序·线：红框解构（控制狂 / 占有） ---------- */
+  a1:{
+    eyebrow:["长夜 · 一","客厅"],
+    speaker:"红框解构",
+    lines:[
+      {t:"客厅被规整得像一间停尸房。不，像一间没人敢碰的展厅。画框摆成绝对水平，椅子归位到毫米，连空气都像被裁过边、再缝死。"},
+      {t:"红框解构蹲在地板中央，用一根红胶带——它唯一的红，也是它唯一的血——把一道裂缝一点点盖住。那道缝，是你很久以前裂开的。"},
+      {t:"「秩序是存在的，」它头也不抬，「只要框得够准，就没有东西会跑。」它说的是「跑」，不是「乱」。",cls:"q"},
+      {t:"它的手指在抖。它以为是专注。你认得那种抖——是你自己，每次锁上门之后的抖。"}
+    ],
+    choices:[
+      {label:"蹲下帮它，把裂缝框得更严实", to:"a2", seq:2},
+      {label:"伸手，悄悄撕开那条红胶带", to:"a3", dis:2},
+      {label:"什么都不做，退到门口看着它", to:"hub"}
+    ]
+  },
+  a2:{
+    eyebrow:["长夜 · 一","客厅"],
+    lines:[
+      {t:"你和它一起，把那道裂缝框进一个完美的红色矩形。裂缝还在，被框住了。被框住的伤口，看起来就像愈合了。"},
+      {t:"「你看，」红框解构长出一口气，肩膀第一次松下来，「只要肯锁，什么都能留下。」它说的是「留下」，不是「安放」。",cls:"q"},
+      {t:"房子里静得像一张绷到极限的纸。你听见自己内部某处，那根线越勒越紧——但你早就分不清，那是勒住别人的，还是勒住自己的。"}
+    ],
+    choices:[
+      {label:"继续——把整栋房子都框进直角", to:"hub", seq:2},
+      {label:"忽然不想再框了，转身走开", to:"hub", dis:1}
+    ]
+  },
+  a3:{
+    eyebrow:["长夜 · 一","客厅"],
+    lines:[
+      {t:"红胶带被你揭起的瞬间，裂缝张开了一线。一股很旧的风灌进来，带着你以为早就忘掉的、空房子的气味。"},
+      {t:"红框解构猛地抬头，瞳孔缩成针尖：「你知道你做了什么吗——」声音发颤，「有一道缝，它们就都听见了。它们会想走。」它怕的不是乱。它怕的是它们离开。",cls:"q"},
+      {t:"话没说完，墙角阴影里，有人轻轻笑了。是失控。它一直在，像你最深的那个念头，从不真正走远。"}
+    ],
+    choices:[
+      {label:"迎着那道缝，把手按进去", to:"b2", dis:2},
+      {label:"和红框解构一起盯住墙角的失控", to:"hub"}
+    ]
+  },
+
+  /* ---------- 溶·线：失控（被锁得最久的那个） ---------- */
+  b1:{
+    eyebrow:["长夜 · 一","走廊尽头"],
+    speaker:"失控",
+    lines:[
+      {t:"走廊往深处走，墙越不像墙。直角开始发软，像被谁用拇指一点点抹开——是你的拇指，你只是不敢认。"},
+      {t:"失控靠在最后一扇门框上。它不坐，从不坐，因为一坐就安稳，一安稳就不再是它。它每呼吸一次，地上的灰就浮起来，整栋房子在它吐纳之间离地半毫米，像随时会飘走，像你每次快要睡着时那种坠落。"},
+      {t:"「你终于自己走过来了，」它声音轻得不像那个压场的气场，「你不用怕我。我不是外面进来的东西。我是你关得最久的那一个——你锁我，是因为你最舍不得放。」",cls:"q"}
+    ],
+    choices:[
+      {label:"推开那扇门，跟它走进去", to:"b2", dis:2},
+      {label:"拽住它的袖子：「你到底想干什么？」", to:"b3", seq:1},
+      {label:"停下，回头看向亮着一线的客厅", to:"hub"}
+    ]
+  },
+  b2:{
+    eyebrow:["长夜 · 二","门后"],
+    lines:[
+      {t:"门后没有房间。门后是一片缓慢涌动的东西——蓝、金、余烬红，低频地翻搅，像你把所有作品倒进一口锅，还没凝固，还没被谁说「可以了」。"},
+      {t:"「这才是你，」失控说，「不是那些框好的画，是这个。一直动、一直没定型、一直没人准它停下来。你恨它，是因为你嫉妒它还能动。」",cls:"q"},
+      {t:"你伸手进去，指尖开始化开边缘。不疼，像终于卸下一样你其实一直扛着、却骗自己说很轻的东西。"}
+    ],
+    choices:[
+      {label:"整个人走进去，让自己化开", to:"hub", dis:2},
+      {label:"在化开之前，猛地抽回手", to:"hub", seq:1}
+    ]
+  },
+  b3:{
+    eyebrow:["长夜 · 二","走廊尽头"],
+    lines:[
+      {t:"你抓住了它。它没有挣。你才发现失控其实很轻，轻到你稍一用力，反倒是你自己晃了一下——你抓的不是它，是你怕它走的那只手。"},
+      {t:"「我想干什么？」它偏头看你，眼底是空的，空得能装下整栋房子的塌方，「我什么都不想干。我只是站在这儿。是你，一看见我就慌，一慌就锁门，一锁门就以为安全。」",cls:"q"},
+      {t:"「你越想抓牢我，越证明你怕我走。你怕的从来不是失控——你怕的是，没有人需要你关着。」",cls:"q"}
+    ],
+    choices:[
+      {label:"松手，承认自己怕", to:"hub", dis:1},
+      {label:"抓得更紧：「我不怕，我只是要你归位」", to:"hub", seq:2}
+    ]
+  },
+
+  /* ---------- 观·线：凝视（戳破牢笼） ---------- */
+  c1:{
+    eyebrow:["长夜 · 一","正中央"],
+    speaker:"凝视",
+    lines:[
+      {t:"凝视坐在房子正中央，一双眼睁着，不看任何具体的东西，又好像把每样都看穿。你在它身边坐下。"},
+      {t:"很久它没动。然后你发现——不是它在看你，是你透过它，看清了你自己：你不是房子的主人。你是被这七个反反复复关在里面、又反反复复把它们关进来的，同一个囚徒。"},
+      {t:"客厅里红框解构在徒劳地量直角（它量了一辈子，量不出一个能让自己停下的数），走廊尽头失控在缓缓呼吸（它呼吸了一辈子，呼不出一个能让自己安分的形状）。"},
+      {t:"凝视开口，只有一句：「你不用选边。你只要承认——这栋房子，是你给自己盖的牢。」",cls:"q"}
+    ],
+    choices:[
+      {label:"继续坐着，看两股力对峙", to:"hub"},
+      {label:"起身，走进它们中间去", to:"hub"}
+    ]
+  },
+
+  /* ---------- 汇合：失控 × 红框解构 正面对峙 ---------- */
+  hub:{
+    eyebrow:["长夜 · 深","客厅 · 唯余二人"],
+    lines:[
+      {t:"不知什么时候，其余五个都散了。蓝色流体植物的藤蔓垂回墙角（它累了，浇了一整夜不存在的花），凝视合上了眼，雾中风景连雾都收走了。整栋房子里，只剩两个还醒着——你最想锁的，和你最怕放的。"},
+      {t:"红框解构站在它量好的直角中央，红胶带缠在指节上，像一道不肯结痂的伤。失控靠在被它压歪了半度的墙角。"},
+      {t:"「你框了我一整夜，」失控轻声说，「你以为框住我，就证明你赢了我。可你锁得最紧的，从来都是你自己。」",cls:"q"},
+      {t:"「我有名字，」红框解构抬头，「我不是『你以为』。我是你舍不得扔的那个部分。你关我，是因为你不敢让我走——你怕我一走，这房子就空了，就只剩你，和你的静。」",cls:"q"},
+      {t:"两股力都停在原地，等一个东西落下来定夺。那个东西，是你手里的钥匙。门是锁着的。你一直都拿着。"}
+    ],
+    choices:[
+      {label:"让红框解构把那半度掰回来——把这一夜钉死成定局", to:"end_check", seq:3},
+      {label:"让失控靠近它——让这栋房子彻底化开", to:"end_check", dis:3},
+      {label:"站到两者正中间，谁也不许赢", to:"end_check", balance:true}
+    ]
+  },
+
+  /* 结局判定占位（由逻辑跳转） */
+};
+
+/* ---------------- 引擎 ---------------- */
+let seq=0, dis=0, steps=0, balanceChosen=false;
+const stage=document.getElementById("stage");
+const nightbar=document.getElementById("nightbar");
+const reduce = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+
+function temperature(){ // -1 冷/序  ... +1 暖/溶
+  const tot = seq+dis || 1;
+  return (dis-seq)/Math.max(tot,3);
+}
+
+function computeEnding(){
+  const diff = seq - dis;           // 正=偏序  负=偏溶
+  if(balanceChosen){
+    // 想同时握住两端：只有当两端本就接近，才能成；否则塌
+    if(Math.abs(diff) <= 2) return "end_breath";
+    return "end_collapse";
+  }
+  if(diff >= 2) return "end_freeze";
+  if(diff <= -2) return "end_dissolve";
+  return "end_breath"; // 一路模糊也可能撞见平衡
+}
+
+const ENDINGS = {
+  end_freeze:{
+    eyebrow:["天亮","定局"],
+    title:"完成，即封存",
+    lines:[
+      {t:"红框解构把那半度掰了回来。喀的一声，整栋房子里所有的角都归了位，再不会偏，也再不会活。"},
+      {t:"你凝固成一件完美的展品——每一处都精确，每一处都不会再变，每一处都再不会有人能碰。可就在最后一道直角合拢的刹那，你听见失控在化开的边缘，极轻地说：「你把自己框好了。现在，没有人能再进来了——包括我。」它笑了一下，「恭喜你。你终于一个人了。」",cls:"q"},
+      {t:"七个住客保持着最后的姿势，像蜡像。房子亮得像一间没有观众的美术馆，永远停在开幕前那一秒。你赢了控制，输掉了所有会被你留住的东西。"},
+      {t:"完成，是安全的。完成，也是一种永夜。你用一生，盖了一座没有人能进来的坟。"}
+    ],
+    foot:"结局 · 序 // 你赢了控制，输掉了所有会被你留住的东西。"
+  },
+  end_dissolve:{
+    eyebrow:["天亮","决口"],
+    title:"化开，无岸",
+    lines:[
+      {t:"失控只是靠近了一点，红框解构缠着红胶带的手，就自己松开了。它松手的样子，像等了很久。"},
+      {t:"墙先软下去，然后是地板、画框、直角，全部化回那片蓝金余烬翻搅的流体。七个住客在其中舒展开，重新流动——可你慢慢发现，它们不是在「回来」，是在「散」。化开得越彻底，它们作为「它们」就越少。最后只剩你，穿着七种形状，独自一人在流体的海里。"},
+      {t:"「这下好了，」失控在流动里说，声音四面八方，「你自由了。你也分不清哪是墙、哪是海、哪是你。更重要的是——它们都不在了。你为了不失去控制，放走了它们；为了不孤独，又化掉了它们。现在你谁都不是，什么都没有。」",cls:"q"},
+      {t:"天亮时，没有人能再指着某处说：这里，是九点九九号宅。你终于不失控了。因为已经没有「你」可以失。"}
+    ],
+    foot:"结局 · 溶 // 你为了不失控，先弄丢了「你」。"
+  },
+  end_collapse:{
+    eyebrow:["天亮","塌方"],
+    title:"你想同时握住两端",
+    lines:[
+      {t:"你站进正中央，一手按住红框解构的直角，一手托住失控的流体，想让它们同时留下——想既被锁住，又被爱着；既安全，又自由。"},
+      {t:"可这一夜的你，早已偏得太远。两端本就撕开了太大的口子，你的手不够长，心也不够大。"},
+      {t:"框的那半边硬得硌手，溶的那半边从指缝漏光。喀啦——你听见自己从正中央裂开。不是塌成流体，也不是凝成展品，是碎。每一片都喊着要不同的东西，没有一片愿意先停。"},
+      {t:"天亮时，九点九九号宅只剩一地既不成形、也不成器的碎片。想要一切的人，往往最先失去一切。你不是输给了失控，也不是输给了控制——你输给了「我都要」。"}
+    ],
+    foot:"结局 · 碎 // 你不是输给控制或失控——是输给「我都要」。"
+  },
+  end_breath:{
+    eyebrow:["天亮","第三种可能"],
+    title:"这栋房子学会了呼吸",
+    lines:[
+      {t:"你站到正中央，没有让谁赢。也没有去够那把钥匙开门——你还不想放它们走，你也受够了锁着它们。"},
+      {t:"红框解构的直角还在，但不再较劲；失控的流体还在涌，但不再决口。它们隔着你，第一次不是对峙，是一呼、一吸。墙微微发抖，却没有塌；框住的地方允许一道缝，化开的地方留住一个形。"},
+      {t:"你终于听见了那句话的真正意思：这栋房子，是你给自己盖的牢。可牢不一定是恨。有时候，人把最重要的东西锁起来，只是因为太怕弄丢。"},
+      {t:"失控轻声笑：「原来你不是这栋房子。」盯着你，「你是那个一直不敢问它们——愿不愿意留下的人。」",cls:"q"},
+      {t:"你低头，看自己手里那把钥匙。你没有开门，也没有继续锁。你只是，第一次，把它们当成了会疼、会想走、也会选择回来的，活的东西。"},
+      {t:"天光漫进来。九点九九号宅一半是直角，一半是流体，中间那道微微发抖的线，不是裂痕，是它还活着、还敢留、还怕失去的证据。最难的不是控制，也不是放手——是敢把门开着，等它们自己选择。"}
+    ],
+    foot:"隐藏结局 · 息 // 最狠的，不是锁，是敢把门开着，等它们自己选。"
+  }
+};
+
+let idx=0, choiceBtns=[];
+function render(nodeId){
+  let node = STORY[nodeId] || ENDINGS[nodeId];
+  const isEnd = !!ENDINGS[nodeId];
+  const scene=document.createElement("div");
+  scene.className="scene"+(isEnd?" ending":"");
+
+  let html="";
+  if(node.eyebrow){
+    html+=`<div class="eyebrow"><span class="dot"></span>${node.eyebrow[0]}<span style="flex:1;height:1px;background:var(--hair)"></span>${node.eyebrow[1]}</div>`;
+  }
+  if(isEnd) html+=`<div class="title">${node.title}</div>`;
+  if(node.speaker) html+=`<div class="speaker">— <b>${node.speaker}</b></div>`;
+  node.lines.forEach(l=>{
+    const c = l.cls? " "+l.cls : "";
+    html+=`<p class="line${c}">${l.t}</p>`;
+  });
+
+  if(isEnd){
+    html+=`<div class="footnote">${node.foot}</div>`;
+    html+=`<button class="restart" id="restart">↺ 再走一夜</button>`;
+  }else{
+    html+=`<div class="choices">`;
+    node.choices.forEach((ch,i)=>{
+      html+=`<button class="choice" data-i="${i}" tabindex="0">${ch.label}</button>`;
+    });
+    html+=`</div>`;
+  }
+  scene.innerHTML=html;
+
+  stage.innerHTML="";
+  stage.appendChild(scene);
+  requestAnimationFrame(()=>scene.classList.add("in"));
+
+  // 夜色进度
+  steps++;
+  nightbar.style.width = Math.min(steps*12,100)+"%";
+  const temp=temperature();
+  nightbar.style.background = temp>0.15
+    ? "linear-gradient(90deg,var(--ember),var(--gold))"
+    : temp<-0.15
+    ? "linear-gradient(90deg,var(--cold),#8fa9cf)"
+    : "linear-gradient(90deg,var(--cold),var(--ember))";
+
+  if(isEnd){
+    document.getElementById("restart").onclick=restart;
+    document.getElementById("restart").focus();
+    return;
+  }
+
+  choiceBtns=[...scene.querySelectorAll(".choice")];
+  idx=0;
+  choiceBtns.forEach(btn=>{
+    btn.onclick=()=>{
+      const ch=node.choices[+btn.dataset.i];
+      if(ch.seq) seq+=ch.seq;
+      if(ch.dis) dis+=ch.dis;
+      if(ch.balance) balanceChosen=true;
+      let next = ch.to;
+      if(next==="end_check") next=computeEnding();
+      go(next);
+    };
+  });
+}
+
+function go(nodeId){
+  const scene=stage.querySelector(".scene");
+  const delay = reduce?120:700;
+  if(scene) scene.classList.remove("in");
+  setTimeout(()=>render(nodeId), delay);
+}
+
+function restart(){
+  seq=0;dis=0;steps=0;balanceChosen=false;
+  nightbar.style.width="0%";
+  go("start");
+}
+
+/* 键盘导航 */
+document.addEventListener("keydown",e=>{
+  if(!choiceBtns.length) return;
+  if(e.key==="ArrowDown"){e.preventDefault();idx=(idx+1)%choiceBtns.length;choiceBtns[idx].focus();}
+  if(e.key==="ArrowUp"){e.preventDefault();idx=(idx-1+choiceBtns.length)%choiceBtns.length;choiceBtns[idx].focus();}
+  if(e.key==="Enter"&&document.activeElement.classList.contains("choice")){document.activeElement.click();}
+});
+
+/* ---------------- 流体背景 ---------------- */
+const cv=document.getElementById("fluid"), cx=cv.getContext("2d");
+let W,H,blobs=[];
+function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight;}
+addEventListener("resize",resize);resize();
+
+const COLORS=[[91,127,176],[201,162,91],[192,90,60]]; // cold / gold / ember
+function seedBlobs(){
+  blobs=[];
+  for(let i=0;i<7;i++){
+    blobs.push({
+      x:Math.random()*W,y:Math.random()*H,
+      r:180+Math.random()*260,
+      c:COLORS[i%COLORS.length],
+      a:Math.random()*Math.PI*2,
+      sp:0.00008+Math.random()*0.00014,
+      amp:60+Math.random()*120
+    });
+  }
+}
+seedBlobs();
+
+let t=0;
+function draw(){
+  t++;
+  cx.clearRect(0,0,W,H);
+  cx.globalCompositeOperation="lighter";
+  const temp=temperature(); // 影响暖冷偏移
+  blobs.forEach((b,i)=>{
+    b.a+=b.sp*16;
+    const x=b.x+Math.cos(b.a)*b.amp;
+    const y=b.y+Math.sin(b.a*0.8)*b.amp;
+    // 体温：偏溶时增强 ember/gold，偏序时增强 cold
+    let [r,g,bl]=b.c;
+    let boost=1;
+    const warm=(b.c[0]>150); // ember/gold 偏暖
+    if(temp>0 && warm) boost=1+temp*0.9;
+    if(temp<0 && !warm) boost=1+(-temp)*0.9;
+    if(temp>0 && !warm) boost=Math.max(0.35,1-temp*0.7);
+    if(temp<0 && warm) boost=Math.max(0.35,1+temp*0.7);
+    const grad=cx.createRadialGradient(x,y,0,x,y,b.r);
+    const alpha=(0.05+0.03*Math.sin(t*0.004+i))*boost;
+    grad.addColorStop(0,`rgba(${r},${g},${bl},${alpha})`);
+    grad.addColorStop(1,`rgba(${r},${g},${bl},0)`);
+    cx.fillStyle=grad;
+    cx.beginPath();cx.arc(x,y,b.r,0,Math.PI*2);cx.fill();
+  });
+  cx.globalCompositeOperation="source-over";
+  if(!reduce) requestAnimationFrame(draw);
+}
+if(reduce){ // 静态一帧
+  draw();
+}else draw();
+
+/* 开场 */
+render("start");
+</script>
+</body>
+</html>

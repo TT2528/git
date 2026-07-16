@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#050505">
+<title>999 — 墨游 / Ink Drift</title>
+<meta name="description" content="999 的交互水墨实验：笔触与流动的数字场域。">
+<meta name="keywords" content="999, 水墨, 互动, 数字艺术">
+<meta name="author" content="999">
+<link rel="canonical" href="https://nine999art.com/concept-ink.html">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+<!-- Open Graph -->
+<meta property="og:site_name" content="999">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nine999art.com/concept-ink.html">
+<meta property="og:title" content="999 — 墨游 / Ink Drift">
+<meta property="og:description" content="999 的交互水墨实验：笔触与流动的数字场域。">
+<meta property="og:image" content="https://af1a7f02cb904d909a3b3c370c67db60.app.codebuddy.work/assets/images/share-cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_CN">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="999 — 墨游 / Ink Drift">
+<meta name="twitter:description" content="999 的交互水墨实验：笔触与流动的数字场域。">
+<meta name="twitter:image" content="https://af1a7f02cb904d909a3b3c370c67db60.app.codebuddy.work/assets/images/share-cover.jpg">
+
+<style>
+  :root{ --serif: "Noto Serif SC", "Songti SC", "Source Han Serif SC", serif; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;background:#000;overflow:hidden;}
+  body{font-family:var(--serif); color:#e8e6e0; cursor:none;}
+  #ink{position:fixed; inset:0; display:block;}
+  .label{position:fixed; transform:translate(-50%,-50%); pointer-events:none; opacity:0;
+    transition:opacity .6s ease; text-align:center; mix-blend-mode:screen; will-change:left,top,opacity;}
+  .label .zh{font-size:23px; letter-spacing:.2em; font-weight:500;}
+  .label .en{font-size:11px; letter-spacing:.34em; opacity:.55; margin-top:7px; text-transform:uppercase;}
+  #identity{position:fixed; left:30px; bottom:26px; font-size:13px; letter-spacing:.55em; opacity:.45;
+    pointer-events:none; font-weight:500;}
+  #hint{position:fixed; right:30px; bottom:26px; font-size:11px; letter-spacing:.3em; opacity:.32;
+    pointer-events:none; text-align:right; line-height:1.9;}
+  #dive{position:fixed; inset:0; opacity:0; pointer-events:none; transition:opacity 1.1s ease;
+    display:flex; align-items:center; justify-content:center; flex-direction:column;}
+  #dive.show{opacity:1; pointer-events:auto;}
+  #dive .dz{font-size:44px; letter-spacing:.22em; font-weight:500; text-shadow:0 0 40px rgba(0,0,0,.6);}
+  #dive .de{font-size:13px; letter-spacing:.42em; opacity:.72; margin-top:16px; text-transform:uppercase;}
+  #dive .ds{font-size:11px; letter-spacing:.32em; opacity:.42; margin-top:46px;}
+  @media (hover:none){ body{cursor:auto;} #hint{display:none;} }
+</style>
+</head>
+<body>
+<canvas id="ink"></canvas>
+<div id="identity">999</div>
+<div id="hint">移动光标 — 墨在水中晕开<br>靠近作品 — 它浮起<br>点击 — 潜入</div>
+<div id="dive"><div class="dz"></div><div class="de"></div><div class="ds">移动光标浮出水面 · 点击返回</div></div>
+<script>
+const cv = document.getElementById('ink');
+const ctx = cv.getContext('2d');
+let W, H, DPR;
+function resize(){
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth; H = window.innerHeight;
+  cv.width = W * DPR; cv.height = H * DPR;
+  cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+resize();
+window.addEventListener('resize', resize);
+
+const works = [
+  {zh:'潮汐之间', en:'Between Tides',      bx:0.27, by:0.33, ax:90,  ay:64, ph:0.0, col:[58,148,138],  r:155},
+  {zh:'无名之手', en:'The Nameless Hand',  bx:0.73, by:0.30, ax:96,  ay:72, ph:1.7, col:[156,62,56],   r:168},
+  {zh:'灰烬密度', en:'Ash Density',        bx:0.39, by:0.73, ax:74,  ay:58, ph:3.1, col:[124,124,134], r:146},
+  {zh:'九',       en:'Nine',               bx:0.81, by:0.75, ax:62,  ay:52, ph:4.6, col:[206,184,120], r:124}
+];
+works.forEach(w=>{
+  w.el = document.createElement('div');
+  w.el.className = 'label';
+  w.el.innerHTML = '<div class="zh">' + w.zh + '</div><div class="en">' + w.en + '</div>';
+  document.body.appendChild(w.el);
+  w.t = 0;
+});
+
+const ink = [];
+const mouse = {x:W/2, y:H/2, px:W/2, py:H/2, active:false};
+
+function spawn(x, y){
+  const a = Math.random()*Math.PI*2, s = Math.random()*0.6;
+  ink.push({x, y, vx:Math.cos(a)*s, vy:Math.sin(a)*s, r:6 + Math.random()*9, life:1, col:[186,204,214]});
+}
+function move(x, y){
+  mouse.px = mouse.x; mouse.py = mouse.y; mouse.x = x; mouse.y = y; mouse.active = true;
+  const dx = mouse.x - mouse.px, dy = mouse.y - mouse.py;
+  const d = Math.hypot(dx, dy);
+  const n = Math.min(5, 1 + Math.floor(d/12));
+  for(let i=0;i<n;i++){
+    spawn(mouse.x - dx*(i/n) + (Math.random()-0.5)*6, mouse.y - dy*(i/n) + (Math.random()-0.5)*6);
+  }
+}
+window.addEventListener('mousemove', e=>move(e.clientX, e.clientY));
+window.addEventListener('touchmove', e=>{ const t=e.touches[0]; if(t) move(t.clientX, t.clientY); }, {passive:true});
+
+let diving = false;
+function dive(w){
+  diving = true;
+  const d = document.getElementById('dive');
+  d.style.background = 'radial-gradient(circle at 50% 50%, rgba(' + w.col.join(',') + ',0.92), #000 72%)';
+  d.querySelector('.dz').textContent = w.zh;
+  d.querySelector('.de').textContent = w.en;
+  d.classList.add('show');
+  tick();
+}
+function surface(){ diving = false; document.getElementById('dive').classList.remove('show'); }
+function tryClick(x, y){
+  if(diving){ surface(); return; }
+  let best = null, bd = 1e9;
+  for(const w of works){
+    const p = pos(w); const d = Math.hypot(x - p.x, y - p.y);
+    if(d < w.r && d < bd){ bd = d; best = w; }
+  }
+  if(best) dive(best);
+}
+window.addEventListener('click', e=>tryClick(e.clientX, e.clientY));
+window.addEventListener('touchstart', e=>{ const t=e.touches[0]; if(t) tryClick(t.clientX, t.clientY); }, {passive:true});
+
+function pos(w){
+  return {
+    x: w.bx*W + Math.sin(w.t*0.5 + w.ph)*w.ax,
+    y: w.by*H + Math.cos(w.t*0.4 + w.ph)*w.ay
+  };
+}
+
+let actx;
+function tick(){
+  try{
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const t = actx.currentTime;
+    const o = actx.createOscillator(), g = actx.createGain(), lp = actx.createBiquadFilter();
+    o.type = 'sine'; o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(72, t + 0.12);
+    lp.type = 'lowpass'; lp.frequency.value = 360;
+    g.gain.setValueAtTime(0.09, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
+    o.connect(lp); lp.connect(g); g.connect(actx.destination);
+    o.start(t); o.stop(t + 0.14);
+  }catch(e){}
+}
+
+let last = performance.now();
+function frame(now){
+  const dt = Math.min(2, (now - last)/16.67); last = now;
+  ctx.fillStyle = 'rgba(0,0,0,0.06)';
+  ctx.fillRect(0, 0, W, H);
+  ctx.globalCompositeOperation = 'lighter';
+  for(const w of works){
+    w.t += 0.01 * dt;
+    const p = pos(w);
+    const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, w.r);
+    g.addColorStop(0,   'rgba(' + w.col.join(',') + ',0.42)');
+    g.addColorStop(0.5, 'rgba(' + w.col.join(',') + ',0.12)');
+    g.addColorStop(1,   'rgba(' + w.col.join(',') + ',0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(p.x, p.y, w.r, 0, Math.PI*2); ctx.fill();
+    const d = Math.hypot(mouse.x - p.x, mouse.y - p.y);
+    w.el.style.left = p.x + 'px'; w.el.style.top = p.y + 'px';
+    w.el.style.opacity = (d < w.r*0.72 && !diving) ? Math.min(1, (w.r*0.72 - d)/(w.r*0.4)) : 0;
+  }
+  for(let i=ink.length-1;i>=0;i--){
+    const p = ink[i];
+    p.x += p.vx*dt; p.y += p.vy*dt; p.r += 0.6*dt; p.life -= 0.012*dt;
+    if(p.life <= 0){ ink.splice(i, 1); continue; }
+    const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
+    g.addColorStop(0, 'rgba(' + p.col.join(',') + ',' + (0.5*p.life) + ')');
+    g.addColorStop(1, 'rgba(' + p.col.join(',') + ',0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.globalCompositeOperation = 'source-over';
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

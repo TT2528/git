@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#050505">
+  <title>999 · 红线签名 · 原型预览</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style id="proto">
+  /* ============ 红线签名 · 原型覆盖层 ============ */
+  :root{
+    color-scheme: dark; /* 修正原站误声明为 light 的 bug */
+    --accent:        #e23b2e;   /* 999 签名色 · 朱红余烬 */
+    --accent-bright: #ff6a52;
+    --accent-soft:   rgba(226,59,46,.14);
+    --accent-line:   rgba(226,59,46,.55);
+  }
+
+  /* 顶部红线 · 滚动进度（signature accent 的强锚点） */
+  #protoProgress{
+    position:fixed; top:0; left:0; height:2px; width:0;
+    background:linear-gradient(90deg,var(--accent),var(--accent-bright));
+    box-shadow:0 0 12px rgba(226,59,46,.7);
+    z-index:9999; transition:width .12s linear; pointer-events:none;
+  }
+
+  /* 原型说明条（可关闭，标注这是预览） */
+  .proto-banner{
+    position:fixed; top:0; left:0; right:0; z-index:9000;
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    padding:9px 18px; font-size:12px; letter-spacing:.04em;
+    background:rgba(12,11,11,.86); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--accent-line);
+    color:rgba(236,236,236,.82); font-family:var(--font-sub);
+    transform:translateY(0); transition:transform .4s var(--ease-silk);
+  }
+  .proto-banner.hide{ transform:translateY(-100%); }
+  .proto-banner b{ color:var(--accent); font-weight:500; }
+  .proto-banner a{ color:var(--fg); text-decoration:none; border-bottom:1px solid var(--accent-line); padding-bottom:1px; transition:color .3s,border-color .3s; }
+  .proto-banner a:hover{ color:var(--accent); border-color:var(--accent); }
+  .proto-banner .x{
+    position:absolute; right:14px; cursor:pointer; color:var(--muted);
+    font-size:16px; line-height:1; padding:2px 6px; transition:color .3s;
+  }
+  .proto-banner .x:hover{ color:var(--accent); }
+
+  /* ============================================================
+     作品场 · 星图（复用原站 field.js，仅保留结构样式）
+     ============================================================ */
+  .field-section{ position:relative; min-height:100vh; overflow:hidden; background:#0b0912; }
+  .field-section__fade{ position:absolute; left:0; right:0; top:0; height:170px; background:linear-gradient(to bottom,#0a0a0a 0%, rgba(10,10,10,0) 100%); z-index:6; pointer-events:none; }
+  .field-section__fade--bottom{ top:auto; bottom:0; background:linear-gradient(to top,#0a0a0a 0%, rgba(10,10,10,0) 100%); }
+  .field-section__label{ position:absolute; top:36px; left:0; right:0; z-index:6; text-align:center; pointer-events:none; font-family:var(--font-sub); font-weight:300; font-size:11px; letter-spacing:0.42em; color:rgba(255,255,255,0.38); text-transform:uppercase; }
+  .field-section .field{ position:absolute; inset:0; overflow:hidden; background:#0b0912; }
+  .field-section .field::before{ content:""; position:absolute; inset:-12%; background:url("assets/images/field-webp/field-bg.webp") center/cover no-repeat; animation:fieldDrift 46s ease-in-out infinite alternate; z-index:0; opacity:.5; filter:brightness(.8) saturate(.85); }
+  @keyframes fieldDrift{ 0%{transform:translate3d(0,0,0);} 100%{transform:translate3d(-6%,-5%,0);} }
+  .field-section .tile{ position:absolute; top:0; left:0; will-change:transform; cursor:grab; transform:translate(-9999px,-9999px); touch-action:none; z-index:1; }
+  .field-section .tile.dragging{ cursor:grabbing; }
+  .field-section .tile__ph{ position:absolute; inset:0; background-size:cover; background-position:center; border-radius:8px; -webkit-mask-image:radial-gradient(135% 135% at 50% 50%, #000 91%, rgba(0,0,0,0.5) 96%, transparent 100%); mask-image:radial-gradient(135% 135% at 50% 50%, #000 91%, rgba(0,0,0,0.5) 96%, transparent 100%); filter:blur(4px); transform:scale(1.03); opacity:.92; pointer-events:none; }
+  .field-section .tile img{ display:block; border-radius:8px; -webkit-mask-image:radial-gradient(135% 135% at 50% 50%, #000 91%, rgba(0,0,0,0.5) 96%, transparent 100%); mask-image:radial-gradient(135% 135% at 50% 50%, #000 91%, rgba(0,0,0,0.5) 96%, transparent 100%); user-select:none; -webkit-user-drag:none; pointer-events:none; opacity:0; transition:opacity .55s ease; }
+  .field-section .tile img.is-loaded{ opacity:1; }
+  .field-section .tile__cap{ position:absolute; left:0; right:0; bottom:0; height:40%; display:flex; align-items:flex-end; justify-content:center; padding-bottom:14px; opacity:0; transition:opacity .35s ease; pointer-events:none; }
+  .field-section .tile:hover .tile__cap{ opacity:1; }
+  .field-section .tile__capbg{ position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.28) 42%, rgba(0,0,0,0) 72%); border-bottom-left-radius:8px; border-bottom-right-radius:8px; }
+  /* 红线签名：hover 时作品名染红，呼应「红框解构」里的红字 */
+  .field-section .tile__name{ position:relative; font-family:var(--font-sub); font-weight:400; font-size:11px; letter-spacing:.16em; color:#fff; text-align:center; padding:0 14px; line-height:1.5; text-shadow:0 1px 8px rgba(0,0,0,.7); transition:color .3s ease; }
+  .field-section .tile:hover .tile__name{ color:var(--accent-bright); }
+  .field-section .hint{ position:absolute; left:50%; bottom:22px; transform:translateX(-50%); z-index:6; font-family:var(--font-sub); font-weight:300; font-size:11px; letter-spacing:.24em; color:rgba(255,255,255,0.5); pointer-events:none; opacity:.7; text-align:center; width:90%; }
+  .field-section .detail{ position:fixed; inset:0; z-index:300; display:flex; align-items:center; justify-content:center; padding:5vh 5vw; opacity:0; visibility:hidden; transition:opacity .26s ease, visibility .26s ease; }
+  .field-section .detail.open{ opacity:1; visibility:visible; }
+  .field-section .detail__backdrop{ position:absolute; inset:0; background:rgba(6,6,8,.88); }
+  .field-section .detail__panel{ position:relative; z-index:2; display:flex; gap:0; max-width:1040px; width:100%; max-height:90vh; background:rgba(20,18,17,.95); border-radius:22px; box-shadow:0 40px 120px rgba(0,0,0,.66), 0 0 0 1px var(--accent-line); overflow:hidden; transform:translateY(16px) scale(.97); transition:transform .34s cubic-bezier(.2,.8,.2,1), opacity .34s ease; }
+  .field-section .detail.open .detail__panel{ transform:translateY(0) scale(1); }
+  .field-section .detail__media{ flex:1 1 58%; min-width:0; background:#0c0b0a; display:flex; align-items:center; justify-content:center; padding:30px; }
+  .field-section .detail__media img{ max-width:100%; max-height:80vh; width:auto; height:auto; object-fit:contain; display:block; border-radius:10px; box-shadow:0 18px 60px rgba(0,0,0,.55); }
+  .field-section .detail__meta{ flex:1 1 42%; padding:52px 48px; display:flex; flex-direction:column; justify-content:center; overflow-y:auto; scrollbar-width:none; -ms-overflow-style:none; }
+  .field-section .detail__meta::-webkit-scrollbar{ width:0; height:0; display:none; }
+  /* 详情系列标签用签名红 */
+  .field-section .detail__series{ font-family:var(--font-sub); font-weight:400; font-size:10.5px; letter-spacing:.36em; text-transform:uppercase; color:var(--accent); margin-bottom:22px; }
+  .field-section .detail__title{ font-family:var(--font-sub); font-weight:400; font-size:20px; line-height:1.5; letter-spacing:.02em; margin:0 0 24px; color:#f4f1ea; }
+  .field-section .detail__desc{ font-family:var(--font-sub); font-weight:300; font-size:14px; line-height:2.1; letter-spacing:.02em; color:rgba(244,241,234,.7); margin:0; }
+  .field-section .detail__close{ position:absolute; top:16px; right:16px; z-index:3; width:38px; height:38px; border-radius:50%; background:rgba(0,0,0,.32); border:none; color:rgba(244,241,234,.66); font-size:19px; line-height:1; cursor:pointer; transition:background .25s, color .25s, transform .25s; }
+  .field-section .detail__close:hover{ background:var(--accent); color:#0a0a0a; transform:scale(1.06); }
+  @media (max-width:760px){
+    .field-section .detail__panel{ flex-direction:column; max-height:92vh; overflow-y:auto; scrollbar-width:none; -ms-overflow-style:none; }
+    .field-section .detail__panel::-webkit-scrollbar{ width:0;height:0;display:none; }
+    .field-section .detail__media{ padding:18px; } .field-section .detail__media img{ max-height:46vh; }
+    .field-section .detail__meta{ padding:26px 22px 34px; }
+  }
+  @media (prefers-reduced-motion:reduce){
+    .field-section .detail,.field-section .detail__panel,.field-section .tile__cap{ transition:none; }
+    .field-section .field::before{ animation:none; }
+  }
+
+  /* ============ 导航 · 红线签名 ============ */
+  .nav-logo{ font-family:var(--font-display); letter-spacing:.18em; font-weight:300; }
+  /* 999 的最后一笔是红的 —— 签名 */
+  .nav-logo .rl{ color:var(--accent); }
+  .nav-links a{
+    text-transform:none;                /* 去默认 uppercase 语法 */
+    letter-spacing:.05em; font-size:.82rem; font-family:var(--font-sub); font-weight:400;
+    color:var(--fg-dim);
+  }
+  .nav-links a::after{
+    background:var(--accent); height:2px; bottom:-6px;
+    box-shadow:0 0 8px var(--accent-line);
+  }
+  .nav-links a:hover, .nav-links a.active{ color:var(--fg); }
+  .nav-links a.active{ color:var(--accent); }
+  .nav-links a:hover::after, .nav-links a.active::after{ width:100%; }
+
+  /* ============ Hero · 红线切割 ============ */
+  .hero-name{ position:relative; }
+  /* 一条红线横贯 999 —— 呼应「红框切割 / 红框解构」 */
+  .hero-redcut{
+    position:absolute; left:-4%; right:-4%; top:52%; height:2px;
+    background:linear-gradient(90deg,transparent,var(--accent) 16%,var(--accent-bright) 50%,var(--accent) 84%,transparent);
+    transform:scaleX(0); transform-origin:left center;
+    box-shadow:0 0 22px rgba(226,59,46,.65);
+    animation:redCut 1.6s cubic-bezier(.22,1,.36,1) 1.2s forwards;
+    z-index:4; pointer-events:none;
+  }
+  @keyframes redCut{ to{ transform:scaleX(1); } }
+  .hero-subtitle{ text-transform:none; letter-spacing:.22em; color:rgba(255,255,255,.5); }
+  .hero-scroll-link{ text-transform:none; letter-spacing:.24em; transition:color .35s ease, letter-spacing .35s ease; }
+  .hero-scroll-link:hover{ color:var(--accent); letter-spacing:.30em; text-shadow:0 0 18px var(--accent-line); }
+  .scroll-line-v{ background:linear-gradient(to bottom,var(--accent-line),transparent); }
+
+  /* ============ 双语简介 · Eyebrow 去套路 ============ */
+  /* 原「001 — WORKS」大写宽字距 eyebrow → 红方块 + 中文标签，打破默认语法 */
+  .proto-eyebrow{ display:flex; align-items:center; gap:.85rem; margin-bottom:1.4rem; }
+  .proto-eyebrow .sq{ width:9px; height:9px; background:var(--accent); display:inline-block; box-shadow:0 0 12px var(--accent-line); flex:none; }
+  .proto-eyebrow .cn{ font-family:var(--font-sub); color:var(--fg); letter-spacing:.2em; font-size:.95rem; }
+  .proto-eyebrow .sep{ color:var(--muted); }
+  .proto-eyebrow .en{ font-family:var(--font-sub); text-transform:uppercase; letter-spacing:.32em; font-size:.62rem; color:var(--muted); }
+
+  /* ============ CTA · 红线填充 ============ */
+  .home-bilingual__cta{
+    position:relative; z-index:0; overflow:hidden;
+    border:1px solid var(--border); color:var(--fg);
+    font-family:var(--font-sub); letter-spacing:.1em; font-size:.82rem; font-weight:400;
+    text-decoration:none; display:inline-block; padding:14px 28px;
+    transition:color .35s var(--ease-silk), border-color .35s, transform .12s var(--ease-silk);
+  }
+  .home-bilingual__cta::before{
+    content:""; position:absolute; inset:0; background:var(--accent);
+    transform:scaleX(0); transform-origin:left center; transition:transform .42s var(--ease-fluid); z-index:-1;
+  }
+  .home-bilingual__cta:hover{ color:#0a0a0a; border-color:var(--accent); }
+  .home-bilingual__cta:hover::before{ transform:scaleX(1); }
+  .home-bilingual__cta:active{ transform:scale(.97); }
+
+  /* ============ 焦点环 · 红线 ============ */
+  *:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+
+  /* ============ 页脚 · 红线锚 ============ */
+  .footer{ position:relative; }
+  .footer::before{ content:""; position:absolute; top:0; left:50%; transform:translateX(-50%); width:42px; height:2px; background:var(--accent); box-shadow:0 0 12px var(--accent-line); }
+  .footer p{ color:var(--muted); }
+  .footer .rl{ color:var(--accent); }
+
+  @media (prefers-reduced-motion:reduce){
+    .hero-redcut{ animation:none; transform:scaleX(1); opacity:.78; }
+    html{ scroll-behavior:auto; }
+  }
+  html{ scroll-behavior:smooth; }
+  </style>
+</head>
+<body>
+
+  <!-- 红线 · 滚动进度 -->
+  <div id="protoProgress"></div>
+
+  <!-- 原型说明条 -->
+  <div class="proto-banner" id="protoBanner">
+    <span>原型预览 · <b>红线签名</b>方向（A 方案）— 不动原文件，仅给「壳」一个 999 的指纹</span>
+    <a href="index.html" target="_blank" rel="noopener">对比原版 ↗</a>
+    <span class="x" id="protoClose" title="收起">×</span>
+  </div>
+
+  <!-- 导航 -->
+  <nav class="nav">
+    <a href="prototype-red-thread.html" class="nav-logo">99<span class="rl">9</span></a>
+    <ul class="nav-links">
+      <li><a href="prototype-red-thread.html" class="active">首页</a></li>
+      <li><a href="portfolio.html">作品集</a></li>
+      <li><a href="models.html">模型展厅</a></li>
+      <li><a href="workflow.html">工作流</a></li>
+      <li><a href="about.html">关于</a></li>
+      <li><a href="contact.html">联系</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="菜单"><span></span><span></span><span></span></button>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <img src="assets/images/home-hero-moodboard.jpg" alt="哥特的余烬" loading="eager">
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-overlay-2"></div>
+    <div class="hero-overlay-3"></div>
+
+    <div class="hero-center">
+      <div class="hero-name">999<span class="hero-redcut"></span></div>
+      <div class="hero-subtitle">流体艺术创作实践</div>
+      <div class="hero-subtitle-en">A practice in fluid art</div>
+    </div>
+
+    <div class="hero-scroll-hint">
+      <a href="#fieldSection" class="hero-scroll-link" id="heroScrollLink">Scroll</a>
+      <div class="scroll-line-v"></div>
+      <a href="portfolio.html" class="hero-works-link">作品合集 · Works</a>
+    </div>
+  </section>
+
+  <!-- 双语简介 -->
+  <section class="home-bilingual reveal-section">
+    <div class="proto-eyebrow">
+      <span class="sq"></span>
+      <span class="cn">作品</span>
+      <span class="sep">/</span>
+      <span class="en">Works · 001</span>
+    </div>
+
+    <h2 class="home-bilingual__title-cn">流体的语法</h2>
+    <p class="home-bilingual__title-en">The Grammar of Fluid</p>
+
+    <div class="home-bilingual__divider"></div>
+
+    <p class="home-bilingual__desc-cn">
+      七个系列，二十件作品。从 3D 渲染的百合花白马到流体解构的人像肖像，
+      从哥特教堂的暗红余烬到羊羊眼的彩色凝视，
+      从蓝色深处的流体飞鸟到红框切割的注视实验——
+      每件作品都是一次对"失控"与"生成"的视觉追问。
+      流体不可控的物理性与数字精确的算法性在此交织，
+      构成一组关于感知、身份与存在的视觉拓扑。
+    </p>
+
+    <p class="home-bilingual__desc-en">
+      Seven series, twenty works. From the 3D-rendered lily white horse to the
+      fluid-deconstructed portraits, from the crimson embers of a Gothic
+      cathedral to the chromatic gaze of a solitary eye,
+      from fluid birds emerging in deep blue to red-framed experiments of looking —
+      each piece is a visual inquiry into loss of control and emergence. The uncontrollable
+      physicality of fluid intertwines with algorithmic precision, forming a
+      visual topology of perception, identity, and being.
+    </p>
+
+    <div class="home-cta-group">
+      <a href="portfolio.html" class="home-bilingual__cta">进入作品集 — Enter</a>
+      <a href="models.html" class="home-bilingual__cta">进入模型展厅 — Enter</a>
+    </div>
+
+    <div class="section-nav" style="margin-top: 64px; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.05); text-align: center;">
+      <a href="workflow.html" class="section-nav__link">
+        <span>查看创作全流程 →</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- 作品场 · 星图（复用 field.js） -->
+  <section class="field-section" id="fieldSection">
+    <div class="field-section__fade"></div>
+    <div class="field-section__fade field-section__fade--bottom"></div>
+    <div class="field-section__label">作品场 · The Field</div>
+    <div class="field" id="field"></div>
+    <div class="hint">拖动可重排 · 悬停看名 · 点击展开</div>
+
+    <div class="detail" id="fieldDetail" aria-hidden="true">
+      <div class="detail__backdrop" data-close></div>
+      <div class="detail__panel">
+        <button class="detail__close" aria-label="关闭" data-close>×</button>
+        <div class="detail__media"><img id="fieldDetailImg" src="" alt=""></div>
+        <div class="detail__meta">
+          <div class="detail__series" id="fieldDetailSeries"></div>
+          <h2 class="detail__title" id="fieldDetailTitle"></h2>
+          <p class="detail__desc" id="fieldDetailDesc"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <p>&copy; <span class="rl">999</span> &mdash; All Rights Reserved</p>
+  </footer>
+
+  <script src="js/field.js"></script>
+  <script>
+  (function(){
+    "use strict";
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    /* 红线滚动进度 */
+    var bar = document.getElementById("protoProgress");
+    function onScroll(){
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      var p = max > 0 ? (h.scrollTop || document.body.scrollTop) / max : 0;
+      bar.style.width = (p * 100).toFixed(2) + "%";
+    }
+    window.addEventListener("scroll", onScroll, { passive:true });
+    window.addEventListener("resize", onScroll);
+    onScroll();
+
+    /* 说明条收起 */
+    var banner = document.getElementById("protoBanner");
+    document.getElementById("protoClose").addEventListener("click", function(){
+      banner.classList.add("hide");
+    });
+  })();
+  </script>
+</body>
+</html>

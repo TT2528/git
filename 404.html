@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#050505">
+  <title>404 — 999</title>
+  <meta name="description" content="页面未找到。">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .nf {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; gap: 1.4rem;
+      padding: var(--space-lg);
+    }
+    .nf__logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 5rem; font-weight: 300; letter-spacing: 0.3em;
+      color: var(--fg); line-height: 1;
+    }
+    .nf__code {
+      font-size: 0.72rem; letter-spacing: 0.42em;
+      color: var(--fg-dim); text-transform: uppercase;
+    }
+    .nf__msg {
+      color: var(--fg-dim); max-width: 30ch;
+      line-height: 1.9; font-size: 0.95rem;
+    }
+    .nf__home { margin-top: 0.6rem; }
+  </style>
+</head>
+<body>
+  <main class="nf">
+    <div class="nf__logo">999</div>
+    <div class="nf__code">404 · Not Found</div>
+    <p class="nf__msg">这一页漂走了，就像星图里某颗还没被命名的点。</p>
+    <a class="section-nav__link nf__home" href="index.html">返回首页</a>
+  </main>
+</body>
+</html>

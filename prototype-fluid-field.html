@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0B0D12">
+  <title>999 · 流体在场 — 原型②</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Noto+Serif+SC:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+  :root{
+    color-scheme: dark;
+    --field:#0B0D12;        /* 被夜蓝浸染的近黑，非死黑 */
+    --field-2:#10141B;
+    --ink-bleed:#161B24;
+    --fg:#ECEAE4;           /* 暖白 */
+    --fg-dim:#868B94;
+    --fg-mute:#565B64;
+    --fluid-blue:#2E5C8A;
+    --fluid-gold:#C9A24B;
+    --fluid-red:#C0453B;     /* 低频，不主导 */
+    --line:rgba(236,234,228,.08);
+    --display:'Fraunces','Noto Serif SC',serif;
+    --serif:'Noto Serif SC','Fraunces',serif;
+    --mono:'Space Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --ease:cubic-bezier(.16,1,.3,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--field);
+    color:var(--fg);
+    font-family:var(--serif);
+    font-weight:300;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  /* 流体在场 · 全屏粒子场（signature 的视觉化） */
+  #fluid{
+    position:fixed; inset:0; z-index:0;
+    width:100%; height:100%;
+    pointer-events:none;
+  }
+  /* 暗角，让中心聚光 */
+  .vignette{
+    position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:radial-gradient(120% 90% at 50% 38%, transparent 40%, rgba(7,8,12,.6) 100%);
+  }
+  .layer{ position:relative; z-index:2; }
+
+  /* 原型说明条 */
+  .proto-banner{
+    position:fixed; top:0; left:0; right:0; z-index:9000;
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    padding:9px 18px; font-size:12px; letter-spacing:.04em;
+    background:rgba(11,13,18,.82); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    color:var(--fg-dim); font-family:var(--mono);
+    transition:transform .4s var(--ease);
+  }
+  .proto-banner.hide{ transform:translateY(-100%); }
+  .proto-banner b{ color:var(--fg); font-weight:700; }
+  .proto-banner a{ color:var(--fg); text-decoration:none; border-bottom:1px solid var(--fg-mute); padding-bottom:1px; transition:color .3s,border-color .3s; }
+  .proto-banner a:hover{ color:var(--fluid-gold); border-color:var(--fluid-gold); }
+  .proto-banner .x{ position:absolute; right:14px; cursor:pointer; color:var(--fg-mute); font-size:16px; padding:2px 6px; transition:color .3s; }
+  .proto-banner .x:hover{ color:var(--fg); }
+
+  /* 导航 · 极低存在感漂浮 */
+  .nav{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:26px clamp(20px,5vw,64px);
+    mix-blend-mode:difference; /* 在亮图/暗场上都能读 */
+  }
+  .nav-logo{
+    font-family:var(--display); font-weight:400;
+    font-size:1.25rem; letter-spacing:.04em; color:#fff;
+    text-decoration:none;
+  }
+  .nav-links{ display:flex; gap:clamp(14px,2.4vw,34px); list-style:none; }
+  .nav-links a{
+    font-family:var(--mono); font-size:.62rem; font-weight:400;
+    letter-spacing:.22em; text-transform:uppercase;
+    color:rgba(255,255,255,.62); text-decoration:none;
+    transition:color .4s var(--ease);
+  }
+  .nav-links a:hover, .nav-links a.active{ color:#fff; }
+  @media (max-width:640px){ .nav-links{ display:none; } }
+
+  /* Hero · thesis：活的流体场 + 克制衬线 */
+  .hero{
+    min-height:100vh; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center;
+    padding:0 24px;
+  }
+  .hero-name{
+    font-family:var(--display); font-weight:300;
+    font-size:clamp(88px,22vw,300px); line-height:.9;
+    letter-spacing:.01em; color:var(--fg);
+    text-shadow:0 2px 50px rgba(0,0,0,.5);
+    will-change:transform;
+  }
+  .hero-sub{
+    margin-top:clamp(20px,3vw,40px);
+    font-family:var(--serif); font-weight:300;
+    font-size:clamp(13px,1.5vw,17px); letter-spacing:.5em;
+    color:var(--fg-dim); text-indent:.5em;
+    will-change:transform;
+  }
+  .hero-sub .en{
+    display:block; margin-top:10px;
+    font-family:var(--display); font-style:italic; font-weight:300;
+    font-size:clamp(11px,1.2vw,14px); letter-spacing:.06em;
+    color:var(--fg-mute); text-indent:0;
+  }
+  .scroll-cue{
+    position:absolute; bottom:36px; left:50%; transform:translateX(-50%);
+    font-family:var(--mono); font-size:.6rem; letter-spacing:.3em;
+    text-transform:uppercase; color:var(--fg-mute);
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+  }
+  .scroll-cue .ln{ width:1px; height:42px; background:linear-gradient(var(--fg-mute),transparent); }
+
+  /* 简介 · 真实系列名作为结构 */
+  .intro{ max-width:880px; margin:0 auto; padding:clamp(80px,14vh,160px) 24px; }
+  .intro .lead{
+    font-family:var(--serif); font-weight:300;
+    font-size:clamp(17px,2.2vw,26px); line-height:2;
+    color:rgba(236,234,228,.82); letter-spacing:.02em;
+  }
+  .intro .lead em{ font-family:var(--display); font-style:italic; color:var(--fg); }
+  .series-index{
+    margin-top:clamp(48px,8vh,90px);
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:1px; background:var(--line); border:1px solid var(--line);
+  }
+  .series-index .s{
+    background:var(--field); padding:22px 20px;
+    display:flex; flex-direction:column; gap:8px;
+    transition:background .5s var(--ease);
+  }
+  .series-index .s:hover{ background:var(--field-2); }
+  .series-index .num{ font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; color:var(--fluid-gold); }
+  .series-index .nm{ font-family:var(--serif); font-weight:400; font-size:.95rem; color:var(--fg); letter-spacing:.04em; }
+
+  /* 作品墙 · 生成式漂浮 + 悬停析出 */
+  .wall-wrap{ padding:clamp(40px,8vh,90px) clamp(20px,5vw,64px) clamp(80px,14vh,160px); }
+  .wall-head{ display:flex; align-items:baseline; justify-content:space-between; gap:20px; margin-bottom:clamp(36px,6vh,64px); flex-wrap:wrap; }
+  .wall-head .t{ font-family:var(--display); font-weight:300; font-size:clamp(26px,4vw,46px); letter-spacing:.01em; }
+  .wall-head .meta{ font-family:var(--mono); font-size:.62rem; letter-spacing:.22em; text-transform:uppercase; color:var(--fg-mute); }
+  .wall{
+    columns:3 280px; column-gap:clamp(16px,2.4vw,34px);
+  }
+  .work{
+    break-inside:avoid; margin-bottom:clamp(16px,2.4vw,34px);
+    position:relative; border-radius:6px; overflow:hidden;
+    transform:translate(var(--ox,0),var(--oy,0)) scale(var(--sc,1));
+    transition:transform .9s var(--ease), opacity .6s var(--ease), filter .6s var(--ease);
+    will-change:transform;
+    cursor:pointer;
+  }
+  .work img{ display:block; width:100%; height:auto; }
+  .work .cap{
+    position:absolute; left:0; right:0; bottom:0;
+    padding:28px 18px 14px;
+    background:linear-gradient(to top, rgba(7,8,12,.82), transparent);
+    font-family:var(--serif); font-size:.8rem; color:var(--fg);
+    letter-spacing:.06em; opacity:0; transition:opacity .5s var(--ease);
+  }
+  .work .cap .k{ display:block; font-family:var(--mono); font-size:.56rem; letter-spacing:.2em; color:var(--fluid-gold); margin-bottom:5px; text-transform:uppercase; }
+  /* 悬停：该图析出提亮，其余沉入 */
+  .wall:hover .work:not(:hover){ opacity:.32; filter:saturate(.6) brightness(.8); }
+  .work:hover{ --sc:1.035; z-index:5; }
+  .work:hover .cap{ opacity:1; }
+  @media (max-width:560px){ .wall{ columns:2 140px; } }
+
+  /* 页脚 */
+  .footer{
+    position:relative; z-index:2; text-align:center;
+    padding:clamp(60px,10vh,120px) 24px clamp(40px,6vh,70px);
+    border-top:1px solid var(--line);
+  }
+  .footer .mk{ font-family:var(--display); font-weight:300; font-size:1.6rem; letter-spacing:.06em; color:var(--fg); }
+  .footer .sub{ margin-top:14px; font-family:var(--mono); font-size:.58rem; letter-spacing:.24em; text-transform:uppercase; color:var(--fg-mute); }
+
+  *:focus-visible{ outline:1px solid var(--fluid-gold); outline-offset:3px; }
+
+  @media (prefers-reduced-motion:reduce){
+    html{ scroll-behavior:auto; }
+    .work{ transition:opacity .4s ease; }
+    .work:hover{ --sc:1; }
+  }
+  </style>
+</head>
+<body>
+
+  <canvas id="fluid"></canvas>
+  <div class="vignette"></div>
+
+  <div class="proto-banner" id="protoBanner">
+    <span>原型② · <b>生成式克制排版 / 流体在场</b> — 全站由一个噪声场驱动极慢呼吸，无单一强调线</span>
+    <a href="index.html" target="_blank" rel="noopener">对比原版 ↗</a>
+    <span class="x" id="protoClose" title="收起">×</span>
+  </div>
+
+  <nav class="nav">
+    <a href="prototype-fluid-field.html" class="nav-logo">999</a>
+    <ul class="nav-links">
+      <li><a href="prototype-fluid-field.html" class="active">在场</a></li>
+      <li><a href="#works">作品</a></li>
+      <li><a href="workflow.html">工作流</a></li>
+      <li><a href="about.html">关于</a></li>
+      <li><a href="contact.html">联系</a></li>
+    </ul>
+  </nav>
+
+  <div class="layer">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-name breathe">999</div>
+      <div class="hero-sub breathe">流体的语法<span class="en">The Grammar of Fluid</span></div>
+      <div class="scroll-cue"><span>进入场域</span><span class="ln"></span></div>
+    </section>
+
+    <!-- 简介 + 真实系列结构 -->
+    <section class="intro">
+      <p class="lead">
+        七个系列，二十件作品。从 3D 渲染的<em>百合花白马</em>到流体解构的人像，
+        从哥特教堂的<em>暗红余烬</em>到羊羊眼的彩色凝视——
+        每件作品都是一次对「失控」与「生成」的视觉追问。
+        这里不陈列作品，<em>让作品在流体中持续生成</em>。
+      </p>
+      <div class="series-index">
+        <div class="s"><span class="num">I</span><span class="nm">百合花白马系列</span></div>
+        <div class="s"><span class="num">II</span><span class="nm">身体研究与手的变体</span></div>
+        <div class="s"><span class="num">III</span><span class="nm">流体肖像与解构人像</span></div>
+        <div class="s"><span class="num">IV</span><span class="nm">抽象流体绘画</span></div>
+        <div class="s"><span class="num">V</span><span class="nm">抽象 3D 与建筑空间</span></div>
+        <div class="s"><span class="num">VI</span><span class="nm">电影感与长卷肖像</span></div>
+        <div class="s"><span class="num">VII</span><span class="nm">感知边界实验</span></div>
+      </div>
+    </section>
+
+    <!-- 作品墙 -->
+    <section class="wall-wrap" id="works">
+      <div class="wall-head">
+        <div class="t">在场 · The Field</div>
+        <div class="meta">20 works / 7 series — hover to surface</div>
+      </div>
+      <div class="wall" id="wall">
+        <div class="work"><img src="assets/images/蓝色流体植物.png" alt=""><div class="cap"><span class="k">IV · 抽象流体</span>蓝色植物</div></div>
+        <div class="work"><img src="assets/images/重修8.png" alt=""><div class="cap"><span class="k">VII · 感知边界</span>红框解构</div></div>
+        <div class="work"><img src="assets/images/菩萨.png" alt=""><div class="cap"><span class="k">III · 流体肖像</span>菩萨 · 流体解构</div></div>
+        <div class="work"><img src="assets/images/百合花白马最新800MM焦距png亮面丝绸(1).png" alt=""><div class="cap"><span class="k">I · 百合花白马</span>亮面丝绸（主版）</div></div>
+        <div class="work"><img src="assets/images/羊羊眼www.png" alt=""><div class="cap"><span class="k">VII · 感知边界</span>羊羊眼 · 彩色凝视</div></div>
+        <div class="work"><img src="assets/images/新.jpg" alt=""><div class="cap"><span class="k">III · 流体肖像</span>红色熔炉</div></div>
+        <div class="work"><img src="assets/images/retouch_2025081414350095.jpg" alt=""><div class="cap"><span class="k">III · 流体肖像</span>蓝发晶体</div></div>
+        <div class="work"><img src="assets/images/IMG_20260210_090302.jpg" alt=""><div class="cap"><span class="k">V · 抽象3D</span>哥特的余烬</div></div>
+        <div class="work"><img src="assets/images/MEITU_20260307_192450919.jpg" alt=""><div class="cap"><span class="k">VI · 电影感</span>冬之枯木与白发</div></div>
+        <div class="work"><img src="assets/images/retouch_2025110112445302.jpg" alt=""><div class="cap"><span class="k">I · 百合花白马</span>六格变体矩阵</div></div>
+        <div class="work"><img src="assets/images/Kibong_Rhee_雾中风景.jpg" alt=""><div class="cap"><span class="k">—</span>雾中风景</div></div>
+        <div class="work"><img src="assets/images/IMG_1861.jpg" alt=""><div class="cap"><span class="k">II · 身体研究</span>指纹里流淌的二进制河</div></div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="mk">999</div>
+      <div class="sub">A practice in fluid art — generated, not displayed</div>
+    </footer>
+  </div>
+
+  <script>
+  (function(){
+    "use strict";
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    /* ---------- 流体粒子场（signature 视觉） ---------- */
+    var cv = document.getElementById("fluid");
+    var ctx = cv.getContext("2d");
+    var W, H, DPR, parts = [];
+    var COLORS = [
+      [46,92,138],   // fluid-blue
+      [201,162,75],  // fluid-gold
+      [192,69,59]    // fluid-red (低频)
+    ];
+    function resize(){
+      DPR = Math.min(window.devicePixelRatio || 1, 2);
+      W = cv.clientWidth = window.innerWidth;
+      H = cv.clientHeight = window.innerHeight;
+      cv.width = W * DPR; cv.height = H * DPR;
+      ctx.setTransform(DPR,0,0,DPR,0,0);
+      var n = Math.round((W*H)/16000); // 密度自适应
+      n = Math.max(60, Math.min(160, n));
+      parts = [];
+      for(var i=0;i<n;i++){
+        var c = i % 9 === 0 ? 2 : (i % 3 === 0 ? 1 : 0); // 红极低频
+        parts.push({
+          bx: Math.random()*W, by: Math.random()*H,
+          r: 0.5 + Math.random()*1.3,
+          a: 0.10 + Math.random()*0.28,
+          sp: 0.00004 + Math.random()*0.00006,
+          ph: Math.random()*Math.PI*2,
+          c: COLORS[c]
+        });
+      }
+    }
+    function frame(t){
+      ctx.clearRect(0,0,W,H);
+      for(var i=0;i<parts.length;i++){
+        var p = parts[i];
+        // 类 curl 流场：位置随时间极慢漂移
+        var nx = Math.sin(t*p.sp + p.by*0.002 + p.ph);
+        var ny = Math.cos(t*p.sp*0.9 + p.bx*0.002 + p.ph);
+        var x = (p.bx + nx*40 + t*0.004*(i%2?1:-1));
+        var y = (p.by + ny*40);
+        x = ((x % W) + W) % W; y = ((y % H) + H) % H;
+        ctx.beginPath();
+        ctx.fillStyle = "rgba("+p.c[0]+","+p.c[1]+","+p.c[2]+","+p.a+")";
+        ctx.arc(x, y, p.r, 0, 6.283);
+        ctx.fill();
+      }
+      raf = requestAnimationFrame(frame);
+    }
+    var raf = null;
+    resize();
+    window.addEventListener("resize", resize);
+    if(reduce){
+      // 静态一帧，不持续运动
+      (function(){ var t=0; ctx.clearRect(0,0,W,H); for(var i=0;i<parts.length;i++){var p=parts[i];ctx.beginPath();ctx.fillStyle="rgba("+p.c[0]+","+p.c[1]+","+p.c[2]+","+p.a+")";ctx.arc(p.bx,p.by,p.r,0,6.283);ctx.fill();} })();
+    } else {
+      raf = requestAnimationFrame(frame);
+    }
+
+    /* ---------- 作品墙 · 极慢噪声漂浮 ---------- */
+    var works = Array.prototype.slice.call(document.querySelectorAll(".work"));
+    works.forEach(function(w,i){
+      w.style.setProperty("--ox", "0px");
+      w.style.setProperty("--oy", "0px");
+      w._seed = i*1.7 + 0.5;
+    });
+    if(!reduce){
+      function driftWorks(t){
+        works.forEach(function(w){
+          var s = w._seed;
+          var ox = Math.sin(t*0.00006 + s) * 3.2;
+          var oy = Math.cos(t*0.00005 + s*1.3) * 3.2;
+          w.style.setProperty("--ox", ox.toFixed(2)+"px");
+          w.style.setProperty("--oy", oy.toFixed(2)+"px");
+        });
+        requestAnimationFrame(driftWorks);
+      }
+      requestAnimationFrame(driftWorks);
+    }
+
+    /* ---------- 排版呼吸（hero 名称/副题，幅度<1px） ---------- */
+    var breathers = Array.prototype.slice.call(document.querySelectorAll(".breathe"));
+    if(!reduce){
+      function breathe(t){
+        breathers.forEach(function(el,i){
+          var s = i*2.1;
+          var dx = Math.sin(t*0.00008 + s) * 0.7;
+          var dy = Math.cos(t*0.00007 + s*1.1) * 0.7;
+          el.style.transform = "translate("+dx.toFixed(2)+"px,"+dy.toFixed(2)+"px)";
+        });
+        requestAnimationFrame(breathe);
+      }
+      requestAnimationFrame(breathe);
+    }
+
+    /* ---------- 说明条 ---------- */
+    var banner = document.getElementById("protoBanner");
+    document.getElementById("protoClose").addEventListener("click", function(){ banner.classList.add("hide"); });
+  })();
+  </script>
+</body>
+</html>

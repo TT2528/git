@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#050505">
+  <title>留言已发送 — 999</title>
+  <meta name="description" content="感谢你的留言，999会尽快回复。">
+  <meta name="keywords" content="999, 留言">
+  <meta name="author" content="999">
+  <link rel="canonical" href="https://nine999art.com/thank-you.html">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+  <!-- Open Graph -->
+  <meta property="og:site_name" content="999">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://nine999art.com/thank-you.html">
+  <meta property="og:title" content="留言已发送 — 999">
+  <meta property="og:description" content="感谢你的留言，999会尽快回复。">
+  <meta property="og:image" content="https://af1a7f02cb904d909a3b3c370c67db60.app.codebuddy.work/assets/images/share-cover.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="zh_CN">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="留言已发送 — 999">
+  <meta name="twitter:description" content="感谢你的留言，999会尽快回复。">
+  <meta name="twitter:image" content="https://af1a7f02cb904d909a3b3c370c67db60.app.codebuddy.work/assets/images/share-cover.jpg">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .thanks {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 6vw;
+    }
+    .thanks__label {
+      font-family: var(--font-sub);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      color: var(--muted);
+      margin-bottom: 28px;
+      text-transform: uppercase;
+    }
+    .thanks h1 {
+      font-weight: 300;
+      letter-spacing: 0.12em;
+      margin-bottom: 20px;
+    }
+    .thanks p {
+      max-width: 420px;
+      color: var(--fg-dim);
+      margin-bottom: 48px;
+      line-height: 1.9;
+    }
+    .thanks__back {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--fg);
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 14px 36px;
+      border-radius: 1px;
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .thanks__back:hover {
+      border-color: rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.03);
+    }
+    .thanks__back svg {
+      transform: rotate(180deg);
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">999</a>
+    <ul class="nav-links">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="portfolio.html">作品集</a></li>
+      <li><a href="models.html">模型展厅</a></li>
+      <li><a href="workflow.html">工作流</a></li>
+      <li><a href="about.html">关于</a></li>
+      <li><a href="contact.html">联系</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="菜单"><span></span><span></span><span></span></button>
+  </nav>
+
+  <section class="thanks">
+    <div class="thanks__label">Message Sent</div>
+    <h1>留言已发送</h1>
+    <p>
+      感谢你的来信。消息已通过邮件送达，我会尽快阅读并回复。<br>
+      如果你着急，也可以直接通过微信 nine999art 联系。
+    </p>
+    <a href="index.html" class="thanks__back">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      <span>返回首页</span>
+    </a>
+  </section>
+
+  <footer class="footer">
+    <p>&copy; 999 &mdash; All Rights Reserved</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

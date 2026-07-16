@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#050505">
+  <title>999 · 流体艺术</title>
+  <meta name="description" content="999的流体艺术作品集——七个系列，二十件作品，跨越3D渲染、数字绘画与实验影像。探索失控与生成之间的视觉拓扑。">
+  <meta name="keywords" content="999, 流体艺术, 数字艺术, 3D渲染, 数字绘画, 实验影像, 作品集, 当代艺术">
+  <meta name="author" content="999">
+  <link rel="canonical" href="https://nine999art.com/">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+  <!-- Open Graph -->
+  <meta property="og:site_name" content="999">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://nine999art.com/">
+  <meta property="og:title" content="999 · 流体艺术">
+  <meta property="og:description" content="999的流体艺术作品集——七个系列，二十件作品，跨越3D渲染、数字绘画与实验影像。">
+  <meta property="og:image" content="https://af1a7f02cb904d909a3b3c370c67db60.app.codebuddy.work/assets/images/share-cover.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="zh_CN">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="999 · 流体艺术">
+  <meta name="twitter:description" content="999的流体艺术作品集——七个系列，二十件作品，跨越3D渲染、数字绘画与实验影像。">
+  <meta name="twitter:image" content="https://af1a7f02cb904d909a3b3c370c67db60.app.codebuddy.work/assets/images/share-cover.jpg">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+  /* ===== 作品场 · 星图总览（首页嵌入，独立于原作品集） ===== */
+  .field-section{
+    position:relative;
+    min-height:100vh;
+    overflow:hidden;
+    background:#0b0912;
+  }
+  .field-section__fade{
+    position:absolute; left:0; right:0; top:0; height:170px;
+    background:linear-gradient(to bottom,#0a0a0a 0%, rgba(10,10,10,0) 100%);
+    z-index:6; pointer-events:none;
+  }
+  .field-section__fade--bottom{
+    top:auto; bottom:0;
+    background:linear-gradient(to top,#0a0a0a 0%, rgba(10,10,10,0) 100%);
+  }
+  .field-section__label{
+    position:absolute; top:36px; left:0; right:0; z-index:6;
+    text-align:center; pointer-events:none;
+    font-family:"Noto Serif SC","Cormorant Garamond",serif;
+    font-weight:300; font-size:11px;
+    letter-spacing:0.42em; color:rgba(255,255,255,0.38); text-transform:uppercase;
+  }
+  .field-section .field{
+    position:absolute; inset:0; overflow:hidden;
+    background:#0b0912;
+  }
+  .field-section .field::before{
+    content:""; position:absolute; inset:-12%;
+    background:url("assets/images/field-webp/field-bg.webp") center/cover no-repeat;
+    animation:fieldDrift 46s ease-in-out infinite alternate;
+    z-index:0;
+    opacity:.5;
+    filter:brightness(.8) saturate(.85);
+  }
+  @keyframes fieldDrift{
+    0%{transform:translate3d(0,0,0);}
+    100%{transform:translate3d(-6%,-5%,0);}
+  }
+  .field-section .tile{
+    position:absolute; top:0; left:0;
+    will-change:transform;
+    cursor:grab;
+    transform:translate(-9999px,-9999px);
+    touch-action:none;
+    z-index:1;
+  }
+  .field-section .tile.dragging{cursor:grabbing;}
+  .field-section .tile__ph{
+    position:absolute; inset:0;
+    background-size:cover; background-position:center;
+    border-radius:8px;
+    -webkit-mask-image:radial-gradient(135% 135% at 50% 50%, #000 91%, rgba(0,0,0,0.5) 96%, transparent 100%);
+            mask-image:radial-gradient(135% 135% at 50% 50%, #000 91%, rgba(0,0,0,0.5) 96%, transparent 100%);
+    filter:blur(4px); transform:scale(1.03);
+    opacity:.92; pointer-events:none;
+  }
+  .field-section .tile img{
+    display:block;
+    border-radius:8px;
+    -webkit-mask-image:radial-gradient(135% 135% at 50% 50%, #000 91%, rgba(0,0,0,0.5) 96%, transparent 100%);
+            mask-image:radial-gradient(135% 135% at 50% 50%, #000 91%, rgba(0,0,0,0.5) 96%, transparent 100%);
+    user-select:none; -webkit-user-drag:none;
+    pointer-events:none;
+    opacity:0; transition:opacity .55s ease;
+  }
+  .field-section .tile img.is-loaded{opacity:1;}
+  .field-section .tile__cap{
+    position:absolute; left:0; right:0; bottom:0;
+    height:40%;
+    display:flex; align-items:flex-end; justify-content:center;
+    padding-bottom:14px;
+    opacity:0; transition:opacity .35s ease;
+    pointer-events:none;
+  }
+  .field-section .tile:hover .tile__cap{opacity:1;}
+  .field-section .tile__capbg{
+    position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.28) 42%, rgba(0,0,0,0) 72%);
+    border-bottom-left-radius:8px; border-bottom-right-radius:8px;
+  }
+  .field-section .tile__name{
+    position:relative;
+    font-family:"Noto Serif SC","Cormorant Garamond",serif; font-weight:400; font-size:11px;
+    letter-spacing:.16em; color:#fff; text-align:center;
+    padding:0 14px; line-height:1.5;
+    text-shadow:0 1px 8px rgba(0,0,0,.7);
+  }
+  .field-section .hint{
+    position:absolute; left:50%; bottom:22px; transform:translateX(-50%);
+    z-index:6; font-family:"Noto Serif SC","Cormorant Garamond",serif; font-weight:300;
+    font-size:11px; letter-spacing:.24em; color:rgba(255,255,255,0.5);
+    pointer-events:none; opacity:.7; text-align:center; width:90%;
+  }
+  /* 详情浮层（复用原站「图+标题+描述」） */
+  .field-section .detail{
+    position:fixed; inset:0; z-index:300;
+    display:flex; align-items:center; justify-content:center;
+    padding:5vh 5vw;
+    opacity:0; visibility:hidden;
+    transition:opacity .26s ease, visibility .26s ease;
+  }
+  .field-section .detail.open{opacity:1; visibility:visible;}
+  .field-section .detail__backdrop{
+    position:absolute; inset:0;
+    background:rgba(6,6,8,.88);
+  }
+  .field-section .detail__panel{
+    position:relative; z-index:2;
+    display:flex; gap:0; max-width:1040px; width:100%;
+    max-height:90vh;
+    background:rgba(20,18,17,.95);
+    border-radius:22px;
+    box-shadow:0 40px 120px rgba(0,0,0,.66), 0 8px 28px rgba(0,0,0,.45);
+    overflow:hidden;
+    transform:translateY(16px) scale(.97);
+    transition:transform .34s cubic-bezier(.2,.8,.2,1), opacity .34s ease;
+  }
+  .field-section .detail.open .detail__panel{transform:translateY(0) scale(1);}
+  .field-section .detail__media{
+    flex:1 1 58%; min-width:0;
+    background:#0c0b0a;
+    display:flex; align-items:center; justify-content:center;
+    padding:30px;
+  }
+  .field-section .detail__media img{
+    max-width:100%; max-height:80vh; width:auto; height:auto;
+    object-fit:contain; display:block;
+    border-radius:10px;
+    box-shadow:0 18px 60px rgba(0,0,0,.55);
+  }
+  .field-section .detail__meta{
+    flex:1 1 42%; padding:52px 48px;
+    display:flex; flex-direction:column; justify-content:center;
+    overflow-y:auto; scrollbar-width:none; -ms-overflow-style:none;
+  }
+  .field-section .detail__meta::-webkit-scrollbar{ width:0; height:0; display:none; }
+  .field-section .detail__series{
+    font-family:"Noto Serif SC","Cormorant Garamond",serif; font-weight:400; font-size:10.5px;
+    letter-spacing:.36em; text-transform:uppercase; color:rgba(255,255,255,.38);
+    margin-bottom:22px;
+  }
+  .field-section .detail__title{
+    font-family:"Noto Serif SC","Cormorant Garamond",serif; font-weight:400; font-size:20px;
+    line-height:1.5; letter-spacing:.02em; margin:0 0 24px;
+    color:#f4f1ea;
+  }
+  .field-section .detail__desc{
+    font-family:"Noto Serif SC","Cormorant Garamond",serif; font-weight:300; font-size:14px;
+    line-height:2.1; letter-spacing:.02em; color:rgba(244,241,234,.7); margin:0;
+  }
+  .field-section .detail__close{
+    position:absolute; top:16px; right:16px; z-index:3;
+    width:38px; height:38px; border-radius:50%;
+    background:rgba(0,0,0,.32); border:none;
+    color:rgba(244,241,234,.66); font-size:19px; line-height:1; cursor:pointer;
+    transition:background .25s, color .25s, transform .25s;
+  }
+  .field-section .detail__close:hover{background:rgba(0,0,0,.6); color:#f4f1ea; transform:scale(1.06);}
+  @media (max-width:760px){
+    .field-section .detail__panel{flex-direction:column; max-height:92vh; overflow-y:auto; scrollbar-width:none; -ms-overflow-style:none;}
+    .field-section .detail__panel::-webkit-scrollbar{width:0;height:0;display:none;}
+    .field-section .detail__media{padding:18px;}
+    .field-section .detail__media img{max-height:46vh;}
+    .field-section .detail__meta{padding:26px 22px 34px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .field-section .detail,.field-section .detail__panel,.field-section .tile__cap{transition:none;}
+    .field-section .field::before{animation:none;}
+  }
+  </style>
+</head>
+<body>
+
+  <!-- 导航 -->
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">999</a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">首页</a></li>
+      <li><a href="portfolio.html">作品集</a></li>
+      <li><a href="models.html">模型展厅</a></li>
+      <li><a href="workflow.html">工作流</a></li>
+      <li><a href="about.html">关于</a></li>
+      <li><a href="contact.html">联系</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="菜单"><span></span><span></span><span></span></button>
+  </nav>
+
+  <!-- ===== Hero ===== -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <img src="assets/images/home-hero-moodboard.jpg" alt="哥特的余烬" loading="eager">
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-overlay-2"></div>
+    <div class="hero-overlay-3"></div>
+
+    <div class="hero-center">
+      <div class="hero-name">999</div>
+      <div class="hero-subtitle">流体艺术创作实践</div>
+      <div class="hero-subtitle-en">A practice in fluid art</div>
+    </div>
+
+    <div class="hero-scroll-hint">
+      <a href="#fieldSection" class="hero-scroll-link" id="heroScrollLink">Scroll</a>
+      <div class="scroll-line-v"></div>
+      <a href="portfolio.html" class="hero-works-link">作品合集 · Works</a>
+    </div>
+  </section>
+
+  <!-- ===== 双语简介 + 作品集入口 ===== -->
+  <section class="home-bilingual reveal-section">
+    <div class="home-bilingual__num">001 — WORKS</div>
+
+    <h2 class="home-bilingual__title-cn">流体的语法</h2>
+    <p class="home-bilingual__title-en">The Grammar of Fluid</p>
+
+    <div class="home-bilingual__divider"></div>
+
+    <p class="home-bilingual__desc-cn">
+      七个系列，二十件作品。从 3D 渲染的百合花白马到流体解构的人像肖像，
+      从哥特教堂的暗红余烬到羊羊眼的彩色凝视，
+      从蓝色深处的流体飞鸟到红框切割的注视实验——
+      每件作品都是一次对"失控"与"生成"的视觉追问。
+      流体不可控的物理性与数字精确的算法性在此交织，
+      构成一组关于感知、身份与存在的视觉拓扑。
+    </p>
+
+    <p class="home-bilingual__desc-en">
+      Seven series, twenty works. From the 3D-rendered lily white horse to the
+      fluid-deconstructed portraits, from the crimson embers of a Gothic
+      cathedral to the chromatic gaze of a solitary eye,
+      from fluid birds emerging in deep blue to red-framed experiments of looking —
+      each piece is a visual inquiry into loss of control and emergence. The uncontrollable
+      physicality of fluid intertwines with algorithmic precision, forming a
+      visual topology of perception, identity, and being.
+    </p>
+
+    <div class="home-cta-group">
+      <a href="portfolio.html" class="home-bilingual__cta">进入作品集 — Enter</a>
+      <a href="models.html" class="home-bilingual__cta">进入模型展厅 — Enter</a>
+    </div>
+
+    <div class="section-nav" style="margin-top: 64px; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.05); text-align: center;">
+      <a href="workflow.html" class="section-nav__link">
+        <span>查看创作全流程 →</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </a>
+    </div>
+
+  </section>
+
+
+  <!-- ===== 作品场 · 星图总览（独立于原作品集，首页嵌入） ===== -->
+  <section class="field-section" id="fieldSection">
+    <div class="field-section__fade"></div>
+    <div class="field-section__fade field-section__fade--bottom"></div>
+    <div class="field-section__label">作品场 · The Field</div>
+    <div class="field" id="field"></div>
+    <div class="hint">拖动可重排 · 悬停看名 · 点击展开</div>
+
+    <div class="detail" id="fieldDetail" aria-hidden="true">
+      <div class="detail__backdrop" data-close></div>
+      <div class="detail__panel">
+        <button class="detail__close" aria-label="关闭" data-close>×</button>
+        <div class="detail__media"><img id="fieldDetailImg" src="" alt=""></div>
+        <div class="detail__meta">
+          <div class="detail__series" id="fieldDetailSeries"></div>
+          <h2 class="detail__title" id="fieldDetailTitle"></h2>
+          <p class="detail__desc" id="fieldDetailDesc"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <p>&copy; 999 &mdash; All Rights Reserved</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/field.js"></script>
+</body>
+</html>

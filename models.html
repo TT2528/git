@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#050505">
+  <title>999 · 模型展厅</title>
+  <meta name="description" content="999 的建模与三维作品展厅——以粒子点云重构的互动装置。持续更新中。">
+  <meta name="keywords" content="999, 模型, 三维, 点云, 互动装置">
+  <meta name="author" content="999">
+  <link rel="canonical" href="https://nine999art.com/models.html">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+  <!-- Open Graph -->
+  <meta property="og:site_name" content="999">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://nine999art.com/models.html">
+  <meta property="og:title" content="999 · 模型展厅">
+  <meta property="og:description" content="999 的建模与三维作品展厅——以粒子点云重构的互动装置。持续更新中。">
+  <meta property="og:image" content="https://af1a7f02cb904d909a3b3c370c67db60.app.codebuddy.work/assets/images/share-cover.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="zh_CN">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="999 · 模型展厅">
+  <meta name="twitter:description" content="999 的建模与三维作品展厅——以粒子点云重构的互动装置。持续更新中。">
+  <meta name="twitter:image" content="https://af1a7f02cb904d909a3b3c370c67db60.app.codebuddy.work/assets/images/share-cover.jpg">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="modulepreload" href="assets/vendor/three/three.module.js">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .models-hero { padding: 150px 6vw 50px; max-width: 1100px; margin: 0 auto; }
+    .models-hero__num { color: var(--muted); font-family: var(--font-sub); font-size:.72rem; letter-spacing:.3em; text-transform:uppercase; }
+    .models-hero__title { font-family: var(--font-display); font-size: clamp(2.2rem, 5vw, 3.6rem); color: var(--fg); margin-top: .6rem; font-weight:400; letter-spacing:.04em; }
+    .models-hero__title-en { color: rgba(255,255,255,.45); font-family: var(--font-sub); font-size:.82rem; letter-spacing:.22em; text-transform:uppercase; margin-top:.4rem; }
+    .models-hero__divider { width:48px; height:1px; background: rgba(255,255,255,.25); margin: 1.4rem 0; }
+    .models-hero__desc { color: var(--muted); font-family: var(--font-sans); font-size: 1rem; line-height:1.95; max-width: 60ch; }
+
+    .models-grid { max-width: 1100px; margin: 0 auto; padding: 40px 6vw 120px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 28px; }
+    .model-card { display:block; background: #0c0c0e; border-radius: 10px; overflow: hidden; text-decoration:none; transition: transform .4s cubic-bezier(.2,.8,.2,1), box-shadow .4s ease; }
+    .model-card:hover { transform: translateY(-5px); box-shadow: 0 18px 50px rgba(0,0,0,.55); }
+    .model-card__preview {
+      position: relative; width:100%; height: 460px; background:#000; touch-action: none; cursor: grab;
+      /* 极轻柔边：只发生在画面最外缘，与作品场其他作品的边界处理同调，但占比很小 */
+      -webkit-mask-image: radial-gradient(130% 130% at 50% 50%, #000 93%, rgba(0,0,0,.5) 98%, transparent 100%);
+      mask-image: radial-gradient(130% 130% at 50% 50%, #000 93%, rgba(0,0,0,.5) 98%, transparent 100%);
+    }
+    .model-card__preview:active { cursor: grabbing; }
+    .model-card__loading { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color: rgba(255,255,255,.4); font-family: var(--font-sub); font-size:.78rem; letter-spacing:.2em; pointer-events:none; }
+    .model-card__body { padding: 22px 24px 28px; }
+    .model-card__name { font-family: var(--font-display); font-size: 1.5rem; color:#fff; font-weight:400; }
+    .model-card__name-en { color: rgba(255,255,255,.45); font-family: var(--font-sub); font-size:.74rem; letter-spacing:.18em; text-transform:uppercase; margin-top:.3rem; }
+    .model-card__desc { color: rgba(255,255,255,.72); font-family: var(--font-sans); font-size:.92rem; line-height:1.75; margin-top:1rem; }
+    .model-card__more { margin-top:1.3rem; color: rgba(255,255,255,.6); font-family: var(--font-sub); font-size:.78rem; letter-spacing:.12em; }
+    .model-card__more span { transition: opacity .3s; }
+
+    @media (max-width: 640px){
+      .models-hero { padding-top: 116px; }
+      .models-grid { grid-template-columns: 1fr; gap: 22px; padding-bottom: 90px; }
+      .model-card__preview { height: 60vh; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 导航 -->
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">999</a>
+    <ul class="nav-links">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="portfolio.html">作品集</a></li>
+      <li><a href="models.html" class="active">模型展厅</a></li>
+      <li><a href="workflow.html">工作流</a></li>
+      <li><a href="about.html">关于</a></li>
+      <li><a href="contact.html">联系</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="菜单"><span></span><span></span><span></span></button>
+  </nav>
+
+  <!-- ===== 展厅头部 ===== -->
+  <section class="models-hero reveal-section">
+    <div class="models-hero__num">002 — MODELS</div>
+    <h1 class="models-hero__title">模型展厅</h1>
+    <p class="models-hero__title-en">Model Gallery</p>
+    <div class="models-hero__divider"></div>
+    <p class="models-hero__desc">
+      以粒子点云重构的三维互动装置。每一件都是可被旋转、被凝视的实体——
+      它们从建模而来，又在光的离散中重新成形。展厅持续生长，新作将在此依次陈列。
+    </p>
+  </section>
+
+  <!-- ===== 作品网格 ===== -->
+  <section class="models-grid">
+
+    <!-- 复制此 .model-card 块即可新增一件模型：改 data-model / 预览容器、标题、描述、进入链接 -->
+    <div class="model-card">
+      <div class="model-card__preview" data-model="./assets/models/ys-installation.glb?v=20260714" data-symbol="9"></div>
+      <div class="model-card__body">
+        <div class="model-card__name">无名之手</div>
+        <div class="model-card__name-en">The Nameless Hand</div>
+        <p class="model-card__desc">万千光点，凝成一只手。它造物，亦被造；无名，故能容纳一切形状与未形。可拖拽旋转、滚轮缩放。</p>
+        <a class="model-card__more" href="ys-installation.html"><span>进入沉浸展厅 →</span></a>
+      </div>
+    </div>
+
+    <!-- 占位：以后新增的模型粘到这里（示例）
+    <div class="model-card">
+      <div class="model-card__preview" data-model="你的模型.glb" data-symbol="9"></div>
+      <div class="model-card__body">
+        <div class="model-card__name">作品名</div>
+        <div class="model-card__name-en">Work Name</div>
+        <p class="model-card__desc">一句话简介。</p>
+        <a class="model-card__more" href="你的模型页.html"><span>进入沉浸展厅 →</span></a>
+      </div>
+    </div>
+    -->
+
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <p>&copy; 999 &mdash; All Rights Reserved</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./assets/vendor/three/three.module.js",
+      "three/addons/": "./assets/vendor/three/addons/"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import { initPointCloud } from './js/pointcloud.js?v=20260714';
+    document.querySelectorAll('.model-card__preview[data-model]').forEach((el) => {
+      const loader = document.createElement('div');
+      loader.className = 'model-card__loading';
+      loader.textContent = '加载中…';
+      el.appendChild(loader);
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            try {
+              initPointCloud(el, {
+                modelUrl: el.dataset.model,
+                textSymbol: el.dataset.symbol || '9',
+                particleSize: 0.15,
+                cameraZ: 18,
+                onLoaded: () => loader.remove(),
+                onError: (err) => { loader.textContent = '加载失败：' + (err && err.message ? err.message : err); }
+              });
+            } catch (err) {
+              loader.textContent = '初始化失败：' + (err && err.message ? err.message : err);
+            }
+            io.disconnect();
+          }
+        });
+      }, { rootMargin: '200px' });
+      io.observe(el);
+    });
+  </script>
+</body>
+</html>
