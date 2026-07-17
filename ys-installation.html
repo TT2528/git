@@ -11,7 +11,7 @@
   <meta name="author" content="999">
   <link rel="canonical" href="https://nine999art.com/ys-installation.html">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-  <link rel="modulepreload" href="assets/vendor/three/three.module.js">
+  <link rel="modulepreload" href="assets/vendor/three/three.module.min.js">
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="999">
@@ -19,7 +19,7 @@
   <meta property="og:url" content="https://nine999art.com/ys-installation.html">
   <meta property="og:title" content="999 — 无名之手 / The Nameless Hand">
   <meta property="og:description" content="999 的互动点云装置：万千光点凝成一只手。可拖拽旋转、滚轮缩放。">
-  <meta property="og:image" content="https://af1a7f02cb904d909a3b3c370c67db60.app.codebuddy.work/assets/images/field-webp/share-cover.webp">
+  <meta property="og:image" content="assets/images/field-webp/share-cover.webp">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:locale" content="zh_CN">
@@ -28,7 +28,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="999 — 无名之手 / The Nameless Hand">
   <meta name="twitter:description" content="999 的互动点云装置：万千光点凝成一只手。可拖拽旋转、滚轮缩放。">
-  <meta name="twitter:image" content="https://af1a7f02cb904d909a3b3c370c67db60.app.codebuddy.work/assets/images/field-webp/share-cover.webp">
+  <meta name="twitter:image" content="assets/images/field-webp/share-cover.webp">
 
   <style>
     html, body { margin: 0; height: 100%; overflow: hidden; background: #000; }
@@ -70,7 +70,7 @@
 <script type="importmap">
 {
   "imports": {
-      "three": "./assets/vendor/three/three.module.js",
+      "three": "./assets/vendor/three/three.module.min.js",
       "three/addons/": "./assets/vendor/three/addons/"
   }
 }
@@ -81,7 +81,7 @@
   const container = document.getElementById('canvas-container');
   const loader = document.getElementById('loader');
   initPointCloud(container, {
-    modelUrl: './assets/models/ys-installation.glb',
+    modelUrl: './assets/models/ys-installation.meshopt.glb',
     textSymbol: '9',
     particleSize: 0.15,
     cameraZ: 18,

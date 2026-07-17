@@ -18,7 +18,7 @@
   <meta property="og:url" content="https://nine999art.com/">
   <meta property="og:title" content="999 · 流体艺术">
   <meta property="og:description" content="999的流体艺术作品集——七个系列，二十件作品，跨越3D渲染、数字绘画与实验影像。">
-  <meta property="og:image" content="https://af1a7f02cb904d909a3b3c370c67db60.app.codebuddy.work/assets/images/field-webp/share-cover.webp">
+  <meta property="og:image" content="assets/images/field-webp/share-cover.webp">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:locale" content="zh_CN">
@@ -27,7 +27,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="999 · 流体艺术">
   <meta name="twitter:description" content="999的流体艺术作品集——七个系列，二十件作品，跨越3D渲染、数字绘画与实验影像。">
-  <meta name="twitter:image" content="https://af1a7f02cb904d909a3b3c370c67db60.app.codebuddy.work/assets/images/field-webp/share-cover.webp">
+  <meta name="twitter:image" content="assets/images/field-webp/share-cover.webp">
 
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -204,6 +204,20 @@
     .field-section .detail,.field-section .detail__panel,.field-section .tile__cap{transition:none;}
     .field-section .field::before{animation:none;}
   }
+
+  /* ===== 首页 · 创作实践三维度 ===== */
+  .practice{max-width:1100px;margin:0 auto;padding:var(--space-xl) var(--space-lg);}
+  .practice__intro{text-align:center;margin-bottom:var(--space-lg);}
+  .practice__title-cn{font-family:var(--font-sans);font-size:clamp(1.6rem,3vw,2.4rem);font-weight:300;letter-spacing:.08em;color:var(--fg);margin:.4rem 0 .6rem;}
+  .practice__title-en{font-family:var(--font-display);font-style:italic;color:var(--fg-dim);font-size:.95rem;letter-spacing:.14em;}
+  .practice__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-md);}
+  .practice__card{display:flex;flex-direction:column;padding:var(--space-md);background:var(--glass);border:1px solid var(--glass-edge);border-radius:var(--radius-md);backdrop-filter:var(--glass-blur-s);-webkit-backdrop-filter:var(--glass-blur-s);transition:transform .5s var(--ease-fluid),border-color .5s var(--ease-silk),background .5s var(--ease-silk);}
+  .practice__card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.18);background:var(--glass-md);}
+  .practice__idx{font-family:var(--font-display);font-size:.8rem;letter-spacing:.3em;color:var(--muted);margin-bottom:1.2rem;}
+  .practice__name{font-family:var(--font-sans);font-size:1.15rem;font-weight:400;letter-spacing:.06em;color:var(--fg);margin-bottom:.9rem;}
+  .practice__desc{font-size:.82rem;line-height:1.9;color:var(--fg-dim);}
+  @media (max-width:760px){.practice__grid{grid-template-columns:1fr;}.practice{padding:var(--space-lg) var(--space-sm);}}
+  @media (prefers-reduced-motion:reduce){.practice__card{transition:none;}.practice__card:hover{transform:none;}}
   </style>
 </head>
 <body>
@@ -306,6 +320,39 @@
           <p class="detail__desc" id="fieldDetailDesc"></p>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- ===== 创作实践 · 三个维度 ===== -->
+  <section class="practice reveal-section">
+    <div class="practice__intro reveal-text">
+      <div class="home-bilingual__num">002 — PRACTICE</div>
+      <h2 class="practice__title-cn">三种媒介，一种追问</h2>
+      <p class="practice__title-en">Three mediums, one inquiry</p>
+      <div class="home-bilingual__divider"></div>
+    </div>
+    <div class="practice__grid">
+      <a class="practice__card" href="about.html">
+        <span class="practice__idx">01</span>
+        <h3 class="practice__name">绘画 · Painting</h3>
+        <p class="practice__desc">从水墨的不可控渗洇，到数字绘画中笔刷与算法噪声的对抗。构图越是精密，越需保留一处刻意崩坏的缺口。</p>
+      </a>
+      <a class="practice__card" href="workflow.html">
+        <span class="practice__idx">02</span>
+        <h3 class="practice__name">三维建模 · 3D</h3>
+        <p class="practice__desc">ZBrush 的数字黏土与 Houdini 的程序化生成，让鬃毛凝固为液态金属，菩萨在粒子解体中缓慢重组。</p>
+      </a>
+      <a class="practice__card" href="about.html">
+        <span class="practice__idx">03</span>
+        <h3 class="practice__name">哲学 · Philosophy</h3>
+        <p class="practice__desc">德勒兹的"差异与重复"、梅洛-庞蒂的知觉现象学——不是装饰注脚，而是创作的底层语法。</p>
+      </a>
+    </div>
+    <div class="section-nav" style="margin-top: 56px; text-align: center;">
+      <a href="about.html" class="section-nav__link">
+        <span>阅读创作者自述 →</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </a>
     </div>
   </section>
 

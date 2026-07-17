@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 
 /**
  * 在指定容器内渲染「无名之手」点云装置。
@@ -88,7 +89,11 @@ export function initPointCloud(container, opts = {}) {
 
   let points = null;
 
-  new GLTFLoader().load(
+  const gltfLoader = new GLTFLoader();
+  // 接入 Meshopt 解码器：模型已用 Meshopt 压缩（点云友好），wasm 内嵌于模块，无需额外托管
+  gltfLoader.setMeshoptDecoder(MeshoptDecoder);
+
+  gltfLoader.load(
     modelUrl,
     (gltf) => {
       let src = null;
