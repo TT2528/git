@@ -1084,6 +1084,17 @@ textarea.form-input { min-height: 150px; line-height: 1.7; }
   }
 }
 
+/* 无 JS 兜底：JS 未启用时内容直接可见，揭示动画不生效（防止图片/文字卡在隐藏态） */
+html:not(.js) .reveal,
+html:not(.js) .reveal-img,
+html:not(.js) .reveal-text,
+html:not(.js) .reveal-section > *,
+html:not(.js) .wf-media img {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+}
+
 /* === 响应式 === */
 @media (max-width: 1024px) {
   .contact__layout { grid-template-columns: 1fr; gap: var(--space-lg); }

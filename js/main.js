@@ -134,6 +134,20 @@
     }
   });
 
+  /* --- 兜底：确保图片与揭示元素最终可见（防止事件遗漏导致空白） --- */
+  function revealFailsafe() {
+    document.querySelectorAll('.wf-media').forEach(function (el) {
+      var img = el.querySelector('img');
+      if (img && (img.complete || img.naturalHeight > 0)) el.classList.add('loaded');
+    });
+    document.querySelectorAll('.reveal, .reveal-img, .reveal-text, .reveal-section').forEach(function (el) {
+      var r = el.getBoundingClientRect();
+      if (r.top < (window.innerHeight || 0) && r.bottom > 0) el.classList.add('visible');
+    });
+  }
+  window.addEventListener('load', function () { setTimeout(revealFailsafe, 1200); });
+  setTimeout(revealFailsafe, 3500);
+
   /* --- 灯箱 Lightbox --- */
   var lightbox = document.getElementById('lightbox');
   var portfolioImages = [];
