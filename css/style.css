@@ -1464,8 +1464,8 @@ html:not(.js) .wf-media img {
 }
 
 /* 淡进动画 — 仅图片，文字不淡进淡出 */
-html.js-reveal .home-works .reveal,
-html.js-reveal .reveal-img {
+html.js-reveal .home-works .reveal:not(.visible),
+html.js-reveal .reveal-img:not(.visible) {
   opacity: 0;
   transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -1476,7 +1476,7 @@ html.js-reveal .reveal-img {
 
 /* === 文字滚动渐显 — 流体感 === */
 /* 全局 .reveal 基础（确保非 .home-works 内的元素也生效） */
-html.js-reveal .reveal {
+html.js-reveal .reveal:not(.visible) {
   opacity: 0;
   transform: translateY(18px);
   transition: opacity 0.6s var(--ease-fluid),
@@ -1487,7 +1487,7 @@ html.js-reveal .reveal {
   transform: translateY(0);
 }
 
-html.js-reveal .reveal-text {
+html.js-reveal .reveal-text:not(.visible) {
   opacity: 0;
   transform: translateY(28px);
   filter: blur(6px);
@@ -1502,7 +1502,7 @@ html.js-reveal .reveal-text {
 }
 
 /* === 板块级渐显 — 子元素依次浮现 === */
-html.js-reveal .reveal-section > * {
+html.js-reveal .reveal-section:not(.visible) > * {
   opacity: 0;
   transform: translateY(22px);
   filter: blur(4px);
