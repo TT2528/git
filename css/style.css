@@ -6,7 +6,7 @@
 
 /* --- 设计令牌 — 黑白灰极简体系 --- */
 :root {
-  color-scheme: light; /* 声明站点为浅色设计，阻止浏览器强制深色把背景图再压暗 */
+  color-scheme: dark; /* 深色站点：滚动条/表单控件跟随深色，避免黑白割裂 */
   /* 色彩：黑 / 白 / 浅灰 三级，禁用高饱和彩色 */
   --ink:        #0a0a0a;
   --ink-mid:    #141414;
@@ -1464,8 +1464,8 @@ html:not(.js) .wf-media img {
 }
 
 /* 淡进动画 — 仅图片，文字不淡进淡出 */
-.home-works .reveal,
-.reveal-img {
+html.js-reveal .home-works .reveal,
+html.js-reveal .reveal-img {
   opacity: 0;
   transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -1476,7 +1476,7 @@ html:not(.js) .wf-media img {
 
 /* === 文字滚动渐显 — 流体感 === */
 /* 全局 .reveal 基础（确保非 .home-works 内的元素也生效） */
-.reveal {
+html.js-reveal .reveal {
   opacity: 0;
   transform: translateY(18px);
   transition: opacity 0.6s var(--ease-fluid),
@@ -1487,7 +1487,7 @@ html:not(.js) .wf-media img {
   transform: translateY(0);
 }
 
-.reveal-text {
+html.js-reveal .reveal-text {
   opacity: 0;
   transform: translateY(28px);
   filter: blur(6px);
@@ -1502,7 +1502,7 @@ html:not(.js) .wf-media img {
 }
 
 /* === 板块级渐显 — 子元素依次浮现 === */
-.reveal-section > * {
+html.js-reveal .reveal-section > * {
   opacity: 0;
   transform: translateY(22px);
   filter: blur(4px);

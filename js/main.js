@@ -6,6 +6,9 @@
 (function () {
   'use strict';
 
+  /* JS 成功启动后才允许隐藏待揭示内容：脚本挂了页面依然完整可见 */
+  document.documentElement.classList.add('js-reveal');
+
   /* --- 滚动双向淡进淡出 — 图片 + 文字 + 板块 --- */
   var revealTargets = document.querySelectorAll('.reveal, .reveal-img, .reveal-text, .reveal-section');
 

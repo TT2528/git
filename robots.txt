@@ -5,4 +5,4 @@ Disallow: /concept-field2.html
 Disallow: /concept-field3.html
 Disallow: /concept-field4.html
 
-Sitemap: https://nine999art.com/sitemap.xml
+Sitemap: https://tt2528.github.io/git/sitemap.xml
